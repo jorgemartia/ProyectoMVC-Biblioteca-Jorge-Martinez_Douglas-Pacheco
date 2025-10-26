@@ -1,26 +1,25 @@
 package command;
+
 import model.Catalogo;
 import model.Libro;
 import util.Validacion;
 
-public class ComandoPrestar implements Comando {
+public class ComandoDevolver implements Comando {
     private final String titulo;
 
-    public ComandoPrestar(String titulo) {
-        this.titulo = titulo;
-    }
+    public ComandoDevolver(String titulo) { this.titulo = titulo; }
 
     @Override
     public void ejecutar() {
         if (!Validacion.campoNoVacio(titulo, "Título")) return;
-
         Catalogo catalogo = Catalogo.getInstancia();
         Libro l = catalogo.buscarPorTitulo(titulo);
         if (!Validacion.existeLibro(titulo, l)) return;
-        if (!Validacion.estaDisponible(l)) return;
-
-        l.prestar();
-        Validacion.mensajeLibroPrestado(titulo);
+        if (l.isDisponible()) {
+            Validacion.mensajeLibroYaDisponible(titulo);
+            return;
+        }
+        l.devolver();
+        Validacion.mensajeLibroDevuelto(titulo);
     }
 }
-

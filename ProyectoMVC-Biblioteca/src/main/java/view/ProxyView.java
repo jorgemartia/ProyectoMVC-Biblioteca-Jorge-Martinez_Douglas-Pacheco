@@ -1,5 +1,6 @@
 package view;
 
-public class ProxyView {
 
+public class ProxyView  {
+    
 }
