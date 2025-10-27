@@ -9,7 +9,6 @@ import javax.swing.SwingUtilities;
 import controller.Controlador;
 import view.InterfazBiblioteca;
 import view.ProxyView;
-import javax.swing.SwingUtilities;
 
 /**
  *
