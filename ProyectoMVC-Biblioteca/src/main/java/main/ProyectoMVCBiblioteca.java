@@ -20,6 +20,8 @@ public class ProyectoMVCBiblioteca {
 
             // Autenticar usuario
             AuthService.Role role = Validacion.autenticarOExit(null, 3);
+            if (role == null)
+                return;
             boolean esAdmin = (role == AuthService.Role.ADMIN);
 
             // Crear Proxy y mostrar interfaz
