@@ -32,6 +32,7 @@ public final class Validacion {
     // Mensajes específicos (evitan concatenación fuera de aquí)
     public static void mensajeLibroAgregado(String titulo) { mostrarInfo("El libro '" + titulo + "' ha sido agregado correctamente."); }
     public static void mensajeLibroPrestado(String titulo) { mostrarInfo("El libro '" + titulo + "' fue prestado."); }
+    public static void mensajeregistroexitoso() { mostrarInfo("Registro Exitoso"); }
     public static void mensajeLibroDevuelto(String titulo) { mostrarInfo("El libro '" + titulo + "' fue devuelto."); }
     public static void mensajeLibroYaExiste(String titulo) { mostrarError("El libro '" + titulo + "' ya existe en el catálogo."); }
     public static void mensajeLibroNoEncontrado(String titulo) { mostrarError("No se encontró el libro '" + titulo + "' en el catálogo."); }
@@ -39,6 +40,7 @@ public final class Validacion {
     public static void mensajeLibroYaDisponible(String titulo) { mostrarAdvertencia("El libro '" + titulo + "' ya está disponible."); }
     public static void mensajeCampoVacio(String campo) { mostrarError("El campo '" + campo + "' no puede estar vacío."); }
     public static void mensajeCatalogoVacio() { mostrarInfo("El catálogo está vacío."); }
+    public static void mensajecamposcompletos() { mostrarAdvertencia("complete todo los campos."); }
 
     // Validaciones
     public static boolean campoNoVacio(String valor, String nombreCampo) {

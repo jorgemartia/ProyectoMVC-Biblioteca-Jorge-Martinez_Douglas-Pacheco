@@ -1,9 +1,7 @@
 package view;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
 
 public class LoginDialog extends JDialog {
     private final JPasswordField pfClave = new JPasswordField(20);
