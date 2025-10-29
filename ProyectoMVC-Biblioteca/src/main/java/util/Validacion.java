@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import model.Catalogo;
 import model.Libro;
 import view.LoginDialog;
+import view.RegistroView;
 
 public final class Validacion {
   private static final String TITULO = "Biblioteca";
@@ -85,7 +86,14 @@ public final class Validacion {
             LoginDialog login = new LoginDialog(parent);
             login.setVisible(true);
             if (!login.isConfirmed()) {
-                // usuario canceló
+                // si el usuario eligió registrarse, abrir la vista de registro y volver a solicitar login
+                if (login.isRegistroSelected()) {
+                    // abrir la pantalla de registro (se muestra en primer plano)
+                    new RegistroView().setVisible(true);
+                     // regresar al inicio del bucle para mostrar nuevamente el login
+                     continue;
+                }
+                // usuario canceló realmente
                 mostrarInfoInterno("Inicio de sesión cancelado.");
                 return AuthService.Role.INVALID;
             }
@@ -106,11 +114,11 @@ public final class Validacion {
 
     // Autentica y si falla cierra la aplicación mostrando el mensaje correspondiente.
     public static AuthService.Role autenticarOExit(Frame parent, int maxAttempts) {
-        AuthService.Role role = autenticarConDialog(parent, maxAttempts);
-        if (role == AuthService.Role.INVALID) {
-            mostrarInfoInterno("No se ha iniciado sesión. La aplicación se cerrará.");
-            System.exit(0);
-        }
-        return role;
+    AuthService.Role role = autenticarConDialog(parent, maxAttempts);
+    if (role == AuthService.Role.INVALID) {
+        // El usuario canceló o fue al registro
+        mostrarInfoInterno("No se ha iniciado sesión.");
     }
+    return role;
+}
 }

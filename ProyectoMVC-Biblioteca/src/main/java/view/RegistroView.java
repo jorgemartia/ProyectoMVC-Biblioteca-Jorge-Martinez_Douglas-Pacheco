@@ -1,12 +1,8 @@
 package view;
 
-import model.Personas;
-import util.Validacion;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import controller.EventosRegistro;
 
 public class RegistroView extends JFrame implements InterfazBiblioteca {
     private JTextField tfNombre;
@@ -15,17 +11,20 @@ public class RegistroView extends JFrame implements InterfazBiblioteca {
     private JTextField tfTelefono;
     private JTextField tfEmail;
     private JPasswordField pfClave;
+
     private JButton btnRegistrar;
     private JButton btnLimpiar;
+    private JButton btnVolver;
 
     public RegistroView() {
         super("Registro de Usuario - Biblioteca");
         initComponents();
+        new EventosRegistro(this); // Vincula los eventos
     }
 
     private void initComponents() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(400, 400);
+        setSize(400, 420);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
@@ -62,27 +61,23 @@ public class RegistroView extends JFrame implements InterfazBiblioteca {
 
         // Panel inferior con botones
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnRegistrar = new JButton("Registrar");
+        btnVolver = new JButton("Volver");
         btnLimpiar = new JButton("Limpiar");
+        btnRegistrar = new JButton("Registrar");
 
         // Estilo botones
-        for (JButton b : new JButton[]{btnRegistrar, btnLimpiar}) {
+        JButton[] botones = {btnVolver, btnLimpiar, btnRegistrar};
+        for (JButton b : botones) {
             b.setFont(new Font("SansSerif", Font.BOLD, 12));
             b.setForeground(Color.WHITE);
             b.setFocusPainted(false);
         }
+
         btnRegistrar.setBackground(new Color(34, 139, 34));
         btnLimpiar.setBackground(new Color(128, 128, 128));
+        btnVolver.setBackground(new Color(70, 130, 180));
 
-        btnRegistrar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                registrarUsuario();
-            }
-        });
-
-        btnLimpiar.addActionListener(e -> limpiarCampos());
-
+        bottomPanel.add(btnVolver);
         bottomPanel.add(btnLimpiar);
         bottomPanel.add(btnRegistrar);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -96,29 +91,19 @@ public class RegistroView extends JFrame implements InterfazBiblioteca {
         panel.add(field, gbc);
     }
 
-    private void registrarUsuario() {
-        if (tfNombre.getText().isEmpty() || tfApellido.getText().isEmpty() ||
-            tfCedula.getText().isEmpty() || tfEmail.getText().isEmpty() ||
-            pfClave.getPassword().length == 0) {
-            Validacion.mensajecamposcompletos();
-            return;
-        }
+    // Métodos de acceso (getters para el controlador)
+    public String getNombre() { return tfNombre.getText(); }
+    public String getApellido() { return tfApellido.getText(); }
+    public String getCedula() { return tfCedula.getText(); }
+    public String getTelefono() { return tfTelefono.getText(); }
+    public String getEmail() { return tfEmail.getText(); }
+    public String getClave() { return new String(pfClave.getPassword()); }
 
-        Personas p = new Personas(
-                tfNombre.getText(),
-                tfApellido.getText(),
-                tfCedula.getText(),
-                tfTelefono.getText(),
-                tfEmail.getText(),
-                new String(pfClave.getPassword()
-        ));
+    public JButton getBtnRegistrar() { return btnRegistrar; }
+    public JButton getBtnLimpiar() { return btnLimpiar; }
+    public JButton getBtnVolver() { return btnVolver; }
 
-        p.guardarEnJSON();
-        Validacion.mensajeregistroexitoso();
-        limpiarCampos();
-    }
-
-    private void limpiarCampos() {
+    public void limpiarCampos() {
         tfNombre.setText("");
         tfApellido.setText("");
         tfCedula.setText("");

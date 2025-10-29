@@ -6,6 +6,7 @@ import javax.swing.*;
 public class LoginDialog extends JDialog {
     private final JPasswordField pfClave = new JPasswordField(20);
     private boolean confirmed = false;
+    private boolean registroSelected = false;
 
     public LoginDialog(Frame parent) {
         super(parent, "Inicio de sesión", true);
@@ -48,30 +49,38 @@ public class LoginDialog extends JDialog {
         panel.add(center, BorderLayout.CENTER);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnCancel = new JButton("Cancelar");
+        JButton btnCancelar = new JButton("Cancelar");
         JButton btnOk = new JButton("Aceptar");
+        JButton btnRegistro = new JButton("Registrarse");
 
         btnOk.addActionListener(e -> {
             confirmed = true;
             setVisible(false);
         });
-        btnCancel.addActionListener(e -> {
+        btnCancelar.addActionListener(e -> {
             confirmed = false;
             pfClave.setText("");
             setVisible(false);
         });
+        btnRegistro.addActionListener(e -> { 
+            // marcar que se solicitó registro y cerrar este diálogo;
+            // la apertura real de la vista de registro la manejará Validacion
+            registroSelected = true;
+            setVisible(false);
+        });
 
         // Estilo botones
-        for (JButton b : new JButton[]{btnCancel, btnOk}) {
+        for (JButton b : new JButton[]{btnCancelar, btnOk, btnRegistro}) {
             b.setFont(new Font("SansSerif", Font.BOLD, 12));
-            b.setBackground(new Color(70, 130, 180));
             b.setForeground(Color.WHITE);
             b.setFocusPainted(false);
         }
-        btnCancel.setBackground(new Color(128, 128, 128));
+        btnCancelar.setBackground(new Color(128, 128, 128));
         btnOk.setBackground(new Color(34, 139, 34));
+        btnRegistro.setBackground(new Color(70, 130, 180));
 
-        buttons.add(btnCancel);
+        buttons.add(btnRegistro);
+        buttons.add(btnCancelar);
         buttons.add(btnOk);
         panel.add(buttons, BorderLayout.SOUTH);
 
@@ -80,4 +89,5 @@ public class LoginDialog extends JDialog {
 
     public String getClave() { return new String(pfClave.getPassword()); }
     public boolean isConfirmed() { return confirmed; }
+    public boolean isRegistroSelected() { return registroSelected; }
 }
