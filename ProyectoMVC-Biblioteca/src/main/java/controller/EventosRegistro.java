@@ -3,7 +3,7 @@ package controller;
 
 import model.Personas;
 import util.Validacion;
-import view.LoginDialog;
+import view.LoginView;
 import view.RegistroView;
 
 import java.awt.event.ActionEvent;
@@ -61,7 +61,8 @@ public class EventosRegistro implements ActionListener {
 
     private void manejarVolver() {
         vista.dispose(); // Cierra la ventana de registro
-        LoginDialog login = new LoginDialog(null);
+        LoginView login = new LoginView(null);
         login.setVisible(true);
     }
+    
 }
