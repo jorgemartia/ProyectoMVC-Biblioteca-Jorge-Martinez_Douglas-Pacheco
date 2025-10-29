@@ -18,7 +18,7 @@ public class Catalogo {
         return instancia;
     }
 
-    public void agregarLibro(Libro l) { libros.add(l); }
+    
 
     public Libro buscarPorTitulo(String titulo) {
         for (Libro l : libros) {

@@ -3,12 +3,24 @@ package model;
 public class Libro {
     private String titulo;
     private String autor;
+    private String isbn;
+    private String categoria;
     private boolean disponible;
 
+    // Constructor
     public Libro(String titulo, String autor) {
         this.titulo = titulo;
         this.autor = autor;
         this.disponible = true;
+    }
+
+    // Setters necesarios
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public String getTitulo() { return titulo; }
