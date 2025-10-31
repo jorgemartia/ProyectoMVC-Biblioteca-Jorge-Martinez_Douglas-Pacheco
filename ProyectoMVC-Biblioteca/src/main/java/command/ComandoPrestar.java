@@ -7,7 +7,9 @@ import model.Libro;
 import util.JsonStorage;
 import util.SessionManager;
 import util.Validacion;
-
+/**
+ * comando que permite prestar un libro a un usuario autenticado o anonimo.
+ */
 public class ComandoPrestar implements Comando {
     private final String isbn;
 
@@ -15,9 +17,16 @@ public class ComandoPrestar implements Comando {
         this.isbn = isbn;
     }
 
+    /**
+     * Ejecuta el préstamo del libro:
+     * <ul>
+     *   <li>Obtiene el usuario actual de la sesión.</li>
+     *   <li>Busca el libro por título.</li>
+     *   <li>Intenta prestarlo y actualiza los datos guardados.</li>
+     * </ul>
+     */
     @Override
     public void ejecutar() {
-        // obtener instancia de SessionManager y luego el usuario actual
         SessionManager session = SessionManager.getInstancia();
         String usuario = session != null ? session.getUsuarioActual() : null;
         if (usuario == null || usuario.trim().isEmpty()) usuario = "ANONIMO";
@@ -26,7 +35,6 @@ public class ComandoPrestar implements Comando {
 
         List<Libro> libros = JsonStorage.cargarLibros();
 
-        // Buscar por título (nombre) en lugar de isbn
         Libro libro = libros.stream()
                 .filter(l -> {
                     String ltit = l.getTitulo() == null ? "" : l.getTitulo().trim();
@@ -43,7 +51,6 @@ public class ComandoPrestar implements Comando {
         try {
             libro.prestar(usuario);
             JsonStorage.guardarLibros(libros);
-            // actualizar el catálogo en memoria para que la vista refleje cambios
             Catalogo.getInstancia().recargarLibros();
             Validacion.mensajeLibroPrestado(libro.getTitulo());
         } catch (IllegalStateException ex) {

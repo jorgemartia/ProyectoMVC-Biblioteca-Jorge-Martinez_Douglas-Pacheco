@@ -1,17 +1,22 @@
 package controller;
 
-import util.Validacion;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import model.Personas;
 import util.AuthService;
 import util.SessionManager;
-import model.Personas;
+import util.Validacion;
 import view.BibliotecaView;
 import view.InterfazBiblioteca;
 import view.LoginView;
 import view.ProxyView;
 import view.RegistroView;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+/**
+ * Controlador que gestiona los eventos del formulario de inicio de sesión.
+ * Valida la clave ingresada, determina el rol del usuario e inicia la vista correspondiente.
+ */
 public class EventosLogin implements ActionListener {
     private final LoginView login;
 
@@ -20,7 +25,10 @@ public class EventosLogin implements ActionListener {
         this.login.getBtnIngresar().addActionListener(this);
         this.login.getBtnRegistrar().addActionListener(this);
     }
-
+    /**
+     * Escucha las acciones de los botones "Ingresar" y "Registrar".
+     * @param e Evento de acción.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
@@ -30,6 +38,9 @@ public class EventosLogin implements ActionListener {
             abrirRegistro();
         }
     }
+    /**
+     * Verifica las credenciales ingresadas e inicia sesión si son válidas.
+     */
 
     private void manejarLogin() {
         String clave = login.getClave();
@@ -48,7 +59,7 @@ public class EventosLogin implements ActionListener {
         // Obtener el nombre del usuario
         String nombreUsuario = obtenerNombreUsuario(clave, rol);
         
-        // ✅ INICIAR SESIÓN EN SESSIONMANAGER
+        // INICIAR SESIÓN EN SESSIONMANAGER
         SessionManager.getInstancia().iniciarSesion(nombreUsuario, rol);
         
         // Mostrar estado de sesión para depuración
@@ -64,6 +75,12 @@ public class EventosLogin implements ActionListener {
         login.dispose();
         abrirBiblioteca(rol == AuthService.Role.ADMIN);
     }
+    /**
+     * Obtiene el nombre del usuario según la clave y el rol.
+     * @param clave Clave de acceso ingresada.
+     * @param rol Rol obtenido del AuthService.
+     * @return Nombre completo o "Usuario" si no se encuentra.
+     */
 
     private String obtenerNombreUsuario(String clave, AuthService.Role rol) {
         if (rol == AuthService.Role.ADMIN) {
@@ -77,7 +94,10 @@ public class EventosLogin implements ActionListener {
         
         return "Usuario";
     }
-
+    
+    /**
+     * Abre la vista de registro y mantiene visible el login al cerrarse.
+     */
     private void abrirRegistro() {
         login.setVisible(false);
         RegistroView registro = new RegistroView();
@@ -89,7 +109,10 @@ public class EventosLogin implements ActionListener {
             }
         });
     }
-
+    /**
+     * Abre la interfaz principal de la biblioteca.
+     * @param esAdmin Indica si el usuario tiene rol de administrador.
+     */
     private void abrirBiblioteca(boolean esAdmin) {
     // Crear la vista
     BibliotecaView bibliotecaView = new BibliotecaView();

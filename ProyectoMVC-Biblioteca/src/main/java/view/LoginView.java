@@ -1,9 +1,33 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
-import controller.EventosLogin;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.SwingConstants;
+
+import controller.EventosLogin;
+/**
+ * Vista de inicio de sesión del sistema de biblioteca.
+ *
+ * Muestra una ventana de tipo diálogo donde el usuario puede ingresar su clave
+ * o elegir registrarse. Sirve como punto de entrada al sistema, 
+ * controlando si el usuario accede como administrador o usuario normal.
+ *
+ * Incluye campos de contraseña y botones para continuar o registrarse, 
+ * gestionados por la clase {@code EventosLogin}.
+ */
 public class LoginView extends JDialog {
 
     private final JPasswordField txtClave;

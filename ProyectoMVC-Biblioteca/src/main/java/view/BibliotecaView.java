@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,6 +13,22 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import util.Diseno;
+
+
+/**
+ * Vista principal del sistema de biblioteca.
+ * 
+ * Proporciona la interfaz gráfica para gestionar las operaciones de la biblioteca,
+ * incluyendo préstamos, devoluciones, registro de libros y visualización del catálogo.
+ * 
+ * La vista utiliza pestañas (JTabbedPane) para separar las secciones de:
+ * - Operaciones de préstamo y devolución.
+ * - Catálogo completo de libros.
+ * - Historial de préstamos activos.
+ * - Administración (visible solo para administradores).
+ * 
+ * Implementa la interfaz {@code InterfazBiblioteca} para ser controlada por la capa Controlador.
+ */
 
 public class BibliotecaView extends JFrame implements InterfazBiblioteca {
     // Componentes de la interfaz

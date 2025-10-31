@@ -4,7 +4,13 @@ import java.util.List;
 
 import model.Catalogo;
 import view.InterfazBiblioteca;
-
+/**
+ * Controlador principal que coordina la interacción entre la vista y el modelo.
+ * 
+ * <p>Se encarga de inicializar la interfaz, actualizar las tablas
+ * del catálogo y los préstamos, y gestionar la visibilidad
+ * de las secciones administrativas.</p>
+ */
 public class Controlador {
     private final Catalogo catalogo = Catalogo.getInstancia();
     private final InterfazBiblioteca vista;
@@ -12,19 +18,23 @@ public class Controlador {
     public Controlador(InterfazBiblioteca vista) {
         this.vista = vista;
     }
-
+    /**
+     * Inicia la aplicación mostrando la interfaz y actualizando las tablas.
+     */
     public void iniciar() {
         vista.mostrar();
-        // Actualizar las tablas al iniciar
         actualizarTablas();
     }
-
+    /**
+     * Retorna el catálogo actual.
+     * @return instancia del catálogo
+     */
     public Catalogo getCatalogo() {
         return catalogo;
     }
 
     /**
-     * ✅ Actualiza todas las tablas de la vista
+     * Actualiza todas las tablas de la vista
      */
     public void actualizarTablas() {
         actualizarTablaCatalogo();
@@ -32,7 +42,7 @@ public class Controlador {
     }
 
     /**
-     * ✅ Actualiza la tabla del catálogo
+     * Actualiza la tabla del catálogo
      */
     public void actualizarTablaCatalogo() {
         List<Object[]>  datosCatalogo = catalogo.getCatalogoCompleto();
@@ -40,15 +50,15 @@ public class Controlador {
     }
 
     /**
-     * ✅ Actualiza la tabla de préstamos
+     * Actualiza la tabla de préstamos
      */
     public void actualizarTablaPrestamos() {
          List<Object[]> datosPrestamos = catalogo.getPrestamosActivos();
         vista.actualizarTablaPrestamos(datosPrestamos);
     }
-
     /**
-     * ✅ Establece la visibilidad de la pestaña de administración
+     * Cambia la visibilidad de la pestaña de administración.
+     * @param visible true para mostrar la pestaña, false para ocultarla
      */
     public void setAdminTabVisible(boolean visible) {
         vista.setAdminTabVisible(visible);

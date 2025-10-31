@@ -10,8 +10,16 @@ import model.Libro;
 import util.JsonStorage;
 import util.Validacion;
 
-
+/**
+ * Comando que agrega un libro al almacenamiento (JSON).
+ * Valida campos, evita duplicados y persiste la lista de libros.
+ *
+ * @since 1.0
+ */
 public class ComandoAgregar implements Comando {
+    /**
+     * Título del libro a agregar.
+     */
     private final String titulo;
     private final String autor;
     private final String isbn;
@@ -22,6 +30,15 @@ public class ComandoAgregar implements Comando {
             + File.separator + "BibliotecaDatos"
             + File.separator + "libros.json";
 
+    /**
+     * Construye el comando de agregado.
+     *
+     * @param titulo título del libro
+     * @param autor autor del libro
+     * @param isbn  identificador ISBN
+     * @param categoria categoría del libro
+     * @param cantidadTotal número total de ejemplares (>=1)
+     */
     public ComandoAgregar(String titulo, String autor, String isbn, String categoria, int cantidadTotal) {
         this.titulo = titulo;
         this.autor = autor;
@@ -30,6 +47,10 @@ public class ComandoAgregar implements Comando {
         this.cantidadTotal = cantidadTotal;
     }
 
+    /**
+     * Ejecuta la acción: valida datos, comprueba duplicados, añade el libro
+     * y persiste la lista en JSON.
+     */
     @Override
     public void ejecutar() {
         if (!Validacion.campoNoVacio(titulo, "Título") ||
@@ -39,7 +60,6 @@ public class ComandoAgregar implements Comando {
             return;
         }
 
-        //validemos la cantidad de disponibles que sea mayor a 0
         if (cantidadTotal <= 0) {
             Validacion.mensajeCantidadInvalida(titulo);;
             return;
@@ -66,6 +86,11 @@ public class ComandoAgregar implements Comando {
         Validacion.mensajeLibroAgregado(titulo);;
     }
 
+    /**
+     * Persiste la lista de libros en el fichero JSON local.
+     *
+     * @param lista lista de libros a guardar
+     */
     private void guardarLibrosEnJSON(List<Libro> lista) {
         try {
             File archivo = new File(RUTA_JSON);

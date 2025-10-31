@@ -7,7 +7,10 @@ import util.Validacion;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Representa un libro dentro del sistema de biblioteca.
+ * Maneja operaciones como préstamo, devolución y persistencia en JSON.
+ */
 public class Libro {
 
     private static final String RUTA_JSON = util.FilePaths.getLibrosPath();
@@ -103,8 +106,10 @@ public class Libro {
     public void setUsuariosPrestamo(List<String> usuariosPrestamo) {
         this.usuariosPrestamo = usuariosPrestamo == null ? new ArrayList<>() : usuariosPrestamo;
     }
-
-    // Prestar: añade usuario y decrementa disponibilidad (thread-safe)
+    /**
+     * Registra el préstamo de una copia del libro a un usuario.
+     * @param usuario nombre del usuario que toma el préstamo
+     */
     public synchronized void prestar(String usuario) {
         if (usuario == null)
             usuario = "DESCONOCIDO";
@@ -117,8 +122,11 @@ public class Libro {
         disponible = cantidadDisponible > 0;
     }
 
-    // Devolver: elimina una ocurrencia del usuario; si no está, permite devolución
-    // "anónima" hasta no superar total
+    /**
+     * Registra la devolución de un libro por parte de un usuario.
+     * @param usuario nombre del usuario que devuelve
+     * @return true si la devolución fue exitosa
+     */
     public synchronized boolean devolver(String usuario) {
         if (usuario == null) {
             Validacion.mensajeusuarioautenticado();
@@ -162,7 +170,9 @@ public class Libro {
         }
     }
 
-    // 🔹 Guardar libro en el JSON
+    /**
+     *  Guardar libro en el JSON evitando duplicados.
+     */
     public void guardarEnJSON() {
         try {
             File archivo = new File(RUTA_JSON);
@@ -197,8 +207,10 @@ public class Libro {
             e.printStackTrace();
         }
     }
-
-    // 🔹 Cargar todos los libros
+    /**
+     * Carga todos los libros registrados desde el archivo JSON.
+     * @return lista de libros
+     */
     public static List<Libro> cargarTodos() {
         try {
             File archivo = new File(RUTA_JSON);
@@ -214,15 +226,14 @@ public class Libro {
         }
     }
 
-    // 🔹 Buscar libro por ISBN
-    public static Libro buscarPorIsbn(String isbn) {
+    /** Busca un libro por ISBN. */
+        public static Libro buscarPorIsbn(String isbn) {
         return cargarTodos().stream()
                 .filter(l -> l.getIsbn().equalsIgnoreCase(isbn))
                 .findFirst()
                 .orElse(null);
     }
-
-    // 🔹 Buscar libro por título
+/** Busca un libro por título. */
     public static Libro buscarPorTitulo(String titulo) {
         return cargarTodos().stream()
                 .filter(l -> l.getTitulo().equalsIgnoreCase(titulo))
@@ -230,7 +241,6 @@ public class Libro {
                 .orElse(null);
     }
 
-    // En la clase Libro, agregar estos métodos:
 
     /**
      * Obtiene la cantidad de ejemplares prestados a un usuario específico

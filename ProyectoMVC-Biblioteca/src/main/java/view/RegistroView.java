@@ -1,10 +1,38 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import controller.EventosRegistro;
 import util.Diseno;
 
+/**
+ * Vista encargada del registro de nuevos usuarios en el sistema de biblioteca.
+ *
+ * Muestra un formulario con campos para ingresar los datos personales del usuario
+ * (nombre, apellido, cédula, teléfono, correo y clave), además de los botones para
+ * registrar, limpiar o volver al login.
+ *
+ * Se comunica con el controlador {@code EventosRegistro}, que gestiona las acciones
+ * de los botones y valida los datos ingresados antes de guardar la información.
+ *
+ * No maneja tablas ni funciones de administración, ya que su única función
+ * es permitir el registro de nuevos usuarios de forma visual y sencilla.
+ */
 public class RegistroView extends JFrame implements InterfazBiblioteca {
     private JTextField tfNombre;
     private JTextField tfApellido;

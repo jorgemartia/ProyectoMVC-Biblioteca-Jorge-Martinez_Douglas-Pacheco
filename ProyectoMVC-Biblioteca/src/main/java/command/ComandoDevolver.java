@@ -10,14 +10,23 @@ import util.Validacion;
 
 public class ComandoDevolver implements Comando {
     private final String isbn;
-
+/**
+ * comando que permite devolver un libro prestado por un usuario autenticado.
+ * @param isbn
+ */
     public ComandoDevolver(String isbn) {
         this.isbn = isbn;
     }
-
+/**
+     * Ejecuta la devolución del libro:
+     * <ul>
+     *   <li>Verifica si el usuario está autenticado.</li>
+     *   <li>Busca el libro por título.</li>
+     *   <li>Intenta devolverlo y actualiza los datos.</li>
+     * </ul>
+     */
     @Override
     public void ejecutar() {
-        // Obtener usuario actual
         SessionManager session = SessionManager.getInstancia();
         String usuario = session != null ? session.getUsuarioActual() : null;
         
@@ -30,7 +39,6 @@ public class ComandoDevolver implements Comando {
 
         List<Libro> libros = JsonStorage.cargarLibros();
 
-        // Buscar por título
         Libro libro = libros.stream()
                 .filter(l -> {
                     String ltit = l.getTitulo() == null ? "" : l.getTitulo().trim();
@@ -48,7 +56,6 @@ public class ComandoDevolver implements Comando {
             boolean ok = libro.devolver(usuario);
             if (ok) {
                 JsonStorage.guardarLibros(libros);
-                // actualizar el catálogo en memoria para que la vista refleje cambios
                 Catalogo.getInstancia().recargarLibros();
                 Validacion.mensajeLibroDevuelto(libro.getTitulo());
             } else {

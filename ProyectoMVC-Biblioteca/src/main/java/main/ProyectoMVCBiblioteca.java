@@ -5,12 +5,16 @@
 package main;
 
 import javax.swing.SwingUtilities;
+
 import controller.Controlador;
-import util.Validacion;
 import util.AuthService;
+import util.Validacion;
 import view.BibliotecaView;
 import view.ProxyView;
-
+/**
+ * Clase principal del proyecto Biblioteca MVC.
+ * Inicia la aplicación, gestiona la autenticación y carga la vista principal.
+ */
 public class ProyectoMVCBiblioteca {
 
     public static void main(String[] args) {

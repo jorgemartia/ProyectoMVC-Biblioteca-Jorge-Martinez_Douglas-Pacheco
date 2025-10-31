@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa a una persona registrada en el sistema de biblioteca.
+ * Administra su información personal y persistencia en archivos JSON.
+ */
 public class Personas {
     private static final String RUTA_JSON = util.FilePaths.getUsuariosPath();
     
@@ -27,8 +31,8 @@ public class Personas {
     @JsonProperty("clave")
     private String clave;
 
-    // Constructores
-    public Personas() {
+    /** Constructor vacío requerido por Jackson. */
+        public Personas() {
     }
 
     public Personas(String nombre, String apellido, String cedula, String telefono, String email, String clave) {
@@ -88,8 +92,9 @@ public class Personas {
     public void setClave(String clave) {
         this.clave = clave;
     }
-
-    // 🟩 Guarda la persona en una lista dentro de un único JSON
+    /**
+     * Guarda la persona en el archivo JSON evitando duplicados por cédula.
+     */
     public void guardarEnJSON() {
         try {
             File archivo = new File(RUTA_JSON);
@@ -122,8 +127,10 @@ public class Personas {
             e.printStackTrace();
         }
     }
-
-    // 🔹 Cargar todos los usuarios
+    /**
+     * Carga todas las personas registradas desde el archivo JSON.
+     * @return Lista de personas almacenadas.
+     */
     public static List<Personas> cargarTodos() {
         try {
             File archivo = new File(RUTA_JSON);
@@ -137,8 +144,11 @@ public class Personas {
             return new ArrayList<>();
         }
     }
-
-    // 🔹 Buscar usuario por clave
+    /**
+     * Busca una persona según su clave de acceso.
+     * @param clave Contraseña asociada al usuario.
+     * @return Objeto Personas si existe, o null en caso contrario.
+     */
     public static Personas buscarPorClave(String clave) {
         return cargarTodos().stream()
                 .filter(p -> p.getClave().equals(clave))

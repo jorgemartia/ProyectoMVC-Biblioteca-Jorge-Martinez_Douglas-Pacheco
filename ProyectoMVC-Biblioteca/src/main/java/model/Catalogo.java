@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import util.JsonStorage;
-
+/**
+ * Clase singleton que gestiona el catálogo de libros de la biblioteca.
+ * Proporciona métodos para acceder y manipular los libros almacenados en un archivo JSON.
+ */
 public class Catalogo {
     private static Catalogo instancia;
     private List<Libro> libros;
@@ -30,7 +33,7 @@ public class Catalogo {
     }
 
     /**
-     * ✅ Método para recargar los libros desde el archivo JSON
+     * Método para recargar los libros desde el archivo JSON
      */
     public void recargarLibros() {
         this.libros = cargarLibros();
@@ -45,7 +48,7 @@ public class Catalogo {
     }
 
     /**
-     * ✅ Obtiene todos los préstamos activos del sistema
+     * Obtiene todos los préstamos activos del sistema
      */
     public List<Object[]> getPrestamosActivos() {
         recargarLibros();
@@ -69,7 +72,7 @@ public class Catalogo {
     }
 
     /**
-     * ✅ Obtiene el catálogo completo con todos los detalles
+     *Obtiene el catálogo completo con todos los detalles
      */
     public List<Object[]> getCatalogoCompleto() {
         recargarLibros();
@@ -90,7 +93,7 @@ public class Catalogo {
     }
 
     /**
-     * ✅ Simula obtener el ID del usuario (en un sistema real vendría de la base de
+     * Simula obtener el ID del usuario (en un sistema real vendría de la base de
      * usuarios)
      */
     private String obtenerIdUsuario(String usuario) {
