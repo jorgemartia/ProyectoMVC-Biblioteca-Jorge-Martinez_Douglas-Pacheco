@@ -3,16 +3,24 @@ package command;
 import model.Libro;
 import util.JsonStorage;
 import util.Validacion;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-public class ComandoRegistrar implements Comando {
+
+public class ComandoAgregar implements Comando {
     private final String titulo;
     private final String autor;
     private final String isbn;
     private final String categoria;
 
-    public ComandoRegistrar(String titulo, String autor, String isbn, String categoria) {
+    private static final String RUTA_JSON = System.getProperty("user.home")
+            + File.separator + "BibliotecaDatos"
+            + File.separator + "libros.json";
+
+    public ComandoAgregar(String titulo, String autor, String isbn, String categoria) {
         this.titulo = titulo;
         this.autor = autor;
         this.isbn = isbn;
@@ -28,10 +36,12 @@ public class ComandoRegistrar implements Comando {
             return;
         }
 
+
         List<Libro> libros = JsonStorage.cargarLibros();
 
         boolean existe = libros.stream().anyMatch(l ->
-                l.getTitulo().equalsIgnoreCase(titulo)
+                l.getTitulo().equalsIgnoreCase(titulo) ||
+                l.getIsbn().equalsIgnoreCase(isbn)
         );
 
         if (existe) {
@@ -42,8 +52,21 @@ public class ComandoRegistrar implements Comando {
         Libro libro = new Libro(titulo, autor, isbn, categoria);
         libros.add(libro);
         JsonStorage.guardarLibros(libros);
+        guardarLibrosEnJSON(libros);
 
         Validacion.mensajeLibroAgregado(titulo);
     }
-}
 
+    private void guardarLibrosEnJSON(List<Libro> lista) {
+        try {
+            File archivo = new File(RUTA_JSON);
+            File carpeta = archivo.getParentFile();
+            if (!carpeta.exists()) carpeta.mkdirs();
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(archivo, lista);
+        } catch (IOException e) {
+            Validacion.mostrarError("Error al guardar los libros en el archivo JSON.");
+        }
+    }
+}

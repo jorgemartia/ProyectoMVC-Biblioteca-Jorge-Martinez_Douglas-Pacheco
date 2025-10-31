@@ -18,6 +18,12 @@ public class Controlador {
         vista.mostrar();
     }
 
-    public BibliotecaView getVista() { return vista; }
-    public Catalogo getCatalogo() { return catalogo; }
+    public BibliotecaView getVista() {
+        return vista;
+    }
+
+    public Catalogo getCatalogo() {
+        return catalogo;
+    }
+
 }

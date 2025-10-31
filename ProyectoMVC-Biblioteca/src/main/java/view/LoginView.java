@@ -9,14 +9,13 @@ public class LoginView extends JDialog {
     private final JPasswordField txtClave;
     private final JButton btnIngresar;
     private final JButton btnRegistrar;
-    private final JButton btnCancelar;
 
     private boolean confirmed = false;
     private boolean registroSelected = false;
 
     public LoginView(Frame parent) {
         super(parent, "Iniciar Sesión", true);
-        setSize(500, 400);
+        setSize(500, 450); // Ventana un poco más alta
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -28,14 +27,14 @@ public class LoginView extends JDialog {
         Color grisTexto = new Color(90, 90, 90);
         Color fondoPanel = Color.WHITE;
 
-        // --- Panel principal estilo tarjeta ---
+        // --- Panel principal (tarjeta) ---
         JPanel panelCard = new JPanel(new GridBagLayout());
         panelCard.setBackground(fondoPanel);
         panelCard.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true),
                 BorderFactory.createEmptyBorder(40, 50, 40, 50)
         ));
-        panelCard.setPreferredSize(new Dimension(380, 280));
+        panelCard.setPreferredSize(new Dimension(380, 360)); // más alto para ver todo
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 8, 10, 8);
@@ -60,18 +59,12 @@ public class LoginView extends JDialog {
         gbc.gridy = 1;
         panelCard.add(lblSub, gbc);
 
-        // --- Espacio visual ---
-        gbc.gridy = 2;
-        panelCard.add(Box.createVerticalStrut(10), gbc);
-
         // --- Campo de clave ---
+        gbc.gridy = 2;
         JLabel lblClave = new JLabel("Password");
         lblClave.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblClave.setForeground(grisTexto);
         lblClave.setHorizontalAlignment(SwingConstants.LEFT);
-
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
         panelCard.add(lblClave, gbc);
 
         txtClave = new JPasswordField();
@@ -82,12 +75,8 @@ public class LoginView extends JDialog {
         ));
         txtClave.setPreferredSize(new Dimension(240, 40));
 
-        gbc.gridy = 4;
+        gbc.gridy = 3;
         panelCard.add(txtClave, gbc);
-
-        // --- Espacio ---
-        gbc.gridy = 5;
-        panelCard.add(Box.createVerticalStrut(15), gbc);
 
         // --- Botón Ingresar (Continue) ---
         btnIngresar = new JButton("Continue");
@@ -99,38 +88,22 @@ public class LoginView extends JDialog {
         btnIngresar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnIngresar.setPreferredSize(new Dimension(260, 45));
 
-        gbc.gridy = 6;
+        gbc.gridy = 4;
         gbc.gridwidth = 2;
         panelCard.add(btnIngresar, gbc);
 
-        // --- Espacio ---
-        gbc.gridy = 7;
-        panelCard.add(Box.createVerticalStrut(10), gbc);
-
-        // --- Enlace de registro ---
-        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-        panelInferior.setBackground(fondoPanel);
-
-        JLabel lblNuevo = new JLabel("New User?");
-        lblNuevo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblNuevo.setForeground(grisTexto);
-
+        // --- Botón Registrar ---
         btnRegistrar = new JButton("Register");
-        btnRegistrar.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnRegistrar.setForeground(azul);
-        btnRegistrar.setBackground(fondoPanel);
-        btnRegistrar.setBorderPainted(false);
+        btnRegistrar.setBackground(new Color(25, 118, 210)); // mismo color que Continue
+        btnRegistrar.setForeground(Color.WHITE);
+        btnRegistrar.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnRegistrar.setFocusPainted(false);
+        btnRegistrar.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
         btnRegistrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegistrar.setPreferredSize(new Dimension(260, 45));
 
-        panelInferior.add(lblNuevo);
-        panelInferior.add(btnRegistrar);
-
-        gbc.gridy = 8;
-        panelCard.add(panelInferior, gbc);
-
-        // --- Botón Cancelar (oculto, solo para eventos) ---
-        btnCancelar = new JButton();
-        btnCancelar.setVisible(false);
+        gbc.gridy = 5; // debajo del botón azul
+        panelCard.add(btnRegistrar, gbc);
 
         add(panelCard);
 
@@ -149,10 +122,6 @@ public class LoginView extends JDialog {
 
     public JButton getBtnRegistrar() {
         return btnRegistrar;
-    }
-
-    public JButton getBtnCancelar() {
-        return btnCancelar;
     }
 
     public boolean isConfirmed() {

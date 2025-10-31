@@ -1,26 +1,39 @@
 package command;
-import model.Catalogo;
+
 import model.Libro;
+import util.JsonStorage;
 import util.Validacion;
+
+import java.util.List;
 
 public class ComandoPrestar implements Comando {
     private final String titulo;
+    private final String usuarioPrestamo;
 
-    public ComandoPrestar(String titulo) {
+    public ComandoPrestar(String titulo, String usuario) {
         this.titulo = titulo;
+        this.usuarioPrestamo = usuario;
     }
 
     @Override
     public void ejecutar() {
         if (!Validacion.campoNoVacio(titulo, "Título")) return;
 
-        Catalogo catalogo = Catalogo.getInstancia();
-        Libro l = catalogo.buscarPorTitulo(titulo);
-        if (!Validacion.existeLibro(titulo, l)) return;
-        if (!Validacion.estaDisponible(l)) return;
+        List<Libro> libros = JsonStorage.cargarLibros();
+        Libro libro = libros.stream()
+                .filter(l -> l.getTitulo().equalsIgnoreCase(titulo))
+                .findFirst()
+                .orElse(null);
 
-        l.prestar();
+        if (!Validacion.existeLibro(titulo, libro)) return;
+
+        if (!libro.isDisponible()) {
+            Validacion.mensajeLibroNoDisponible(titulo);
+            return;
+        }
+
+        libro.prestar(usuarioPrestamo);
+        JsonStorage.actualizarLibro(libro);
         Validacion.mensajeLibroPrestado(titulo);
     }
 }
-
