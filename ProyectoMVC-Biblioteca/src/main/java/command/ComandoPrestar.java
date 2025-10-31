@@ -1,39 +1,55 @@
 package command;
 
-import model.Libro;
-import util.JsonStorage;
-import util.Validacion;
-
 import java.util.List;
 
-public class ComandoPrestar implements Comando {
-    private final String titulo;
-    private final String usuarioPrestamo;
+import model.Catalogo;
+import model.Libro;
+import util.JsonStorage;
+import util.SessionManager;
+import util.Validacion;
 
-    public ComandoPrestar(String titulo, String usuario) {
-        this.titulo = titulo;
-        this.usuarioPrestamo = usuario;
+public class ComandoPrestar implements Comando {
+    private final String isbn;
+
+    public ComandoPrestar(String isbn) {
+        this.isbn = isbn;
     }
 
     @Override
     public void ejecutar() {
-        if (!Validacion.campoNoVacio(titulo, "Título")) return;
+        // obtener instancia de SessionManager y luego el usuario actual
+        SessionManager session = SessionManager.getInstancia();
+        String usuario = session != null ? session.getUsuarioActual() : null;
+        if (usuario == null || usuario.trim().isEmpty()) usuario = "ANONIMO";
+
+        String id = isbn == null ? "" : isbn.trim();
 
         List<Libro> libros = JsonStorage.cargarLibros();
+
+        // Buscar por título (nombre) en lugar de isbn
         Libro libro = libros.stream()
-                .filter(l -> l.getTitulo().equalsIgnoreCase(titulo))
+                .filter(l -> {
+                    String ltit = l.getTitulo() == null ? "" : l.getTitulo().trim();
+                    return ltit.equalsIgnoreCase(id);
+                })
                 .findFirst()
                 .orElse(null);
 
-        if (!Validacion.existeLibro(titulo, libro)) return;
-
-        if (!libro.isDisponible()) {
-            Validacion.mensajeLibroNoDisponible(titulo);
+        if (libro == null) {
+            Validacion.mostrarError("Libro no encontrado.");
             return;
         }
 
-        libro.prestar(usuarioPrestamo);
-        JsonStorage.actualizarLibro(libro);
-        Validacion.mensajeLibroPrestado(titulo);
+        try {
+            libro.prestar(usuario);
+            JsonStorage.guardarLibros(libros);
+            // actualizar el catálogo en memoria para que la vista refleje cambios
+            Catalogo.getInstancia().recargarLibros();
+            Validacion.mensajeLibroPrestado(libro.getTitulo());
+        } catch (IllegalStateException ex) {
+            Validacion.mostrarError(ex.getMessage());
+        } catch (Exception ex) {
+            Validacion.mostrarError("Error al prestar el libro.");
+        }
     }
 }

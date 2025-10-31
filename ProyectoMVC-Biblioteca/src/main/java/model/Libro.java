@@ -1,10 +1,7 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +20,22 @@ public class Libro {
     private String categoria;
     @JsonProperty("disponible")
     private boolean disponible;
-    private String usuarioPrestamo;
+
+    // Reemplazado el campo único por una lista de usuarios
+    @JsonProperty("usuariosPrestamo")
+    private List<String> usuariosPrestamo = new ArrayList<>();
+
+    @JsonProperty("cantidadTotal")
+    private int cantidadTotal;
+    @JsonProperty("cantidadDisponible")
+    private int cantidadDisponible;
 
     // Constructor vacío para Jackson
     public Libro() {
+        this.cantidadTotal = 1;
+        this.cantidadDisponible = 1;
+        this.usuariosPrestamo = new ArrayList<>();
+        this.disponible = true;
     }
 
     // Constructor con parámetros
@@ -35,56 +44,85 @@ public class Libro {
         this.autor = autor;
         this.isbn = isbn;
         this.categoria = categoria;
+        this.cantidadTotal = 1;
+        this.cantidadDisponible = 1;
+        this.usuariosPrestamo = new ArrayList<>();
         this.disponible = true;
     }
 
-    // Getters y setters
-    public String getTitulo() {
-        return titulo;
+    // Constructor con cantidad
+    public Libro(String titulo, String autor, String isbn, String categoria, int cantidadTotal) {
+        this(titulo, autor, isbn, categoria);
+        this.cantidadTotal = Math.max(1, cantidadTotal);
+        this.cantidadDisponible = this.cantidadTotal;
+        this.disponible = this.cantidadDisponible > 0;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    // Getters / setters mínimos relevantes
+    public String getTitulo() { return titulo; }
+    public String getAutor() { return autor; }
+    public String getIsbn() { return isbn; }
+    public String getCategoria() { return categoria; }
+    public boolean isDisponible() { return disponible; }
+
+    public int getCantidadTotal() { return cantidadTotal; }
+    public void setCantidadTotal(int cantidadTotal) {
+        this.cantidadTotal = Math.max(1, cantidadTotal);
+        if (this.cantidadDisponible > this.cantidadTotal) {
+            this.cantidadDisponible = this.cantidadTotal;
+        }
+        this.disponible = this.cantidadDisponible > 0;
     }
 
-    public String getAutor() {
-        return autor;
+    public int getCantidadDisponible() { return cantidadDisponible; }
+    public void setCantidadDisponible(int cantidadDisponible) {
+        this.cantidadDisponible = Math.max(0, Math.min(cantidadDisponible, this.cantidadTotal));
+        this.disponible = this.cantidadDisponible > 0;
     }
 
-    public void setAutor(String autor) {
-        this.autor = autor;
+    public List<String> getUsuariosPrestamo() {
+        if (usuariosPrestamo == null) usuariosPrestamo = new ArrayList<>();
+        return usuariosPrestamo;
     }
 
-    public String getIsbn() {
-        return isbn;
+    public void setUsuariosPrestamo(List<String> usuariosPrestamo) {
+        this.usuariosPrestamo = usuariosPrestamo == null ? new ArrayList<>() : usuariosPrestamo;
     }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
+    // Prestar: añade usuario y decrementa disponibilidad (thread-safe)
+    public synchronized void prestar(String usuario) {
+        if (usuario == null) usuario = "DESCONOCIDO";
+        if (cantidadDisponible <= 0) {
+            throw new IllegalStateException("No hay ejemplares disponibles de este libro.");
+        }
+        // permitir que el mismo usuario tome más de una copia si es necesario
+        usuariosPrestamo.add(usuario);
+        cantidadDisponible--;
+        disponible = cantidadDisponible > 0;
     }
 
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
-    public boolean isDisponible() {
-        return disponible;
-    }
-
-    public void setDisponible(boolean disponible) {
-        this.disponible = disponible;
-    }
-
-    public String getUsuarioPrestamo() {
-        return usuarioPrestamo;
-    }
-
-    public void setUsuarioPrestamo(String usuarioPrestamo) {
-        this.usuarioPrestamo = usuarioPrestamo;
+    // Devolver: elimina una ocurrencia del usuario; si no está, permite devolución "anónima" hasta no superar total
+    public synchronized boolean devolver(String usuario) {
+        boolean removed = false;
+        if (usuario != null) {
+            removed = usuariosPrestamo.remove(usuario);
+        }
+        if (removed) {
+            if (cantidadDisponible < cantidadTotal) {
+                cantidadDisponible++;
+                disponible = cantidadDisponible > 0;
+            }
+            return true;
+        } else {
+            // devolución sin registro del usuario (p.ej. administrador o dato perdido)
+            if (cantidadDisponible < cantidadTotal) {
+                cantidadDisponible++;
+                disponible = cantidadDisponible > 0;
+                return true;
+            }
+            // nada que devolver (ya al tope)
+            return false;
+        }
     }
 
     // 🔹 Guardar libro en el JSON
@@ -95,12 +133,12 @@ public class Libro {
             if (!carpeta.exists())
                 carpeta.mkdirs();
 
-            ObjectMapper mapper = new ObjectMapper();
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             List<Libro> lista;
 
             // Si el archivo ya existe, cargar los libros existentes
             if (archivo.exists()) {
-                lista = mapper.readValue(archivo, new TypeReference<List<Libro>>() {
+                lista = mapper.readValue(archivo, new com.fasterxml.jackson.core.type.TypeReference<List<Libro>>() {
                 });
             } else {
                 lista = new ArrayList<>();
@@ -118,7 +156,7 @@ public class Libro {
                 System.out.println("⚠️ El libro con título o ISBN ya existe.");
             }
 
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             e.printStackTrace();
         }
     }
@@ -130,10 +168,10 @@ public class Libro {
             if (!archivo.exists())
                 return new ArrayList<>();
 
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(archivo, new TypeReference<List<Libro>>() {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            return mapper.readValue(archivo, new com.fasterxml.jackson.core.type.TypeReference<List<Libro>>() {
             });
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -153,21 +191,6 @@ public class Libro {
                 .filter(l -> l.getTitulo().equalsIgnoreCase(titulo))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public void prestar(String usuario) {
-        this.disponible = false;
-        this.usuarioPrestamo = usuario;
-    }
-
-    public boolean devolver(String usuario) {
-        // Solo el mismo usuario puede devolverlo
-        if (usuarioPrestamo != null && usuarioPrestamo.equalsIgnoreCase(usuario)) {
-            this.disponible = true;
-            this.usuarioPrestamo = null;
-            return true;
-        }
-        return false; // No autorizado
     }
 
 }

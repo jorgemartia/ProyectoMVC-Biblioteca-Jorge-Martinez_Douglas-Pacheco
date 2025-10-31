@@ -1,5 +1,10 @@
 package controller;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JOptionPane;
+
 import command.Comando;
 import command.ComandoAgregar;
 import command.ComandoDevolver;
@@ -8,9 +13,6 @@ import model.Catalogo;
 import util.SessionManager;
 import util.Validacion;
 import view.BibliotecaView;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
 
 public class EventosBiblioteca implements ActionListener {
     private final Controlador controlador;
@@ -51,8 +53,9 @@ public class EventosBiblioteca implements ActionListener {
         String autor = vista.getAutorAdminInput();
         String isbn = vista.getIsbnAdminInput();
         String categoria = vista.getCategoriaAdminInput();
+        int cantidadTotal = vista.getCantidadAdminInput();
 
-        Comando c = new ComandoAgregar(titulo, autor, isbn, categoria);
+        Comando c = new ComandoAgregar(titulo, autor, isbn, categoria, cantidadTotal);
         c.ejecutar();
         
         controlador.getCatalogo().recargarLibros();
@@ -70,7 +73,7 @@ public class EventosBiblioteca implements ActionListener {
         
         String usuarioActual = session.getUsuarioActual();
         String titulo = vista.getTituloInput();
-        Comando c = new ComandoPrestar(titulo, usuarioActual);
+        Comando c = new ComandoPrestar(titulo);
         c.ejecutar();
         
         controlador.getCatalogo().recargarLibros();
@@ -89,7 +92,7 @@ public class EventosBiblioteca implements ActionListener {
         
         String usuarioActual = session.getUsuarioActual();
         String titulo = vista.getTituloInput();
-        Comando c = new ComandoDevolver(titulo, usuarioActual);
+        Comando c = new ComandoDevolver(titulo);
         c.ejecutar();
         
         controlador.getCatalogo().recargarLibros();
