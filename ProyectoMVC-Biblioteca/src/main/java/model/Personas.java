@@ -3,14 +3,21 @@ package model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import util.Validacion;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa a una persona registrada en el sistema de biblioteca.
+ * Administra su información personal y persistencia en archivos JSON.
+ */
 public class Personas {
-    private static final String RUTA_JSON = System.getProperty("user.home") + File.separator + "BibliotecaDatos" + File.separator + "usuarios.json";
-
+    private static final String RUTA_JSON = util.FilePaths.getUsuariosPath();
+    
     @JsonProperty("nombre")
     private String nombre;
     @JsonProperty("apellido")
@@ -24,8 +31,9 @@ public class Personas {
     @JsonProperty("clave")
     private String clave;
 
-    // Constructores
-    public Personas() {}
+    /** Constructor vacío requerido por Jackson. */
+        public Personas() {
+    }
 
     public Personas(String nombre, String apellido, String cedula, String telefono, String email, String clave) {
         this.nombre = nombre;
@@ -37,37 +45,70 @@ public class Personas {
     }
 
     // Getters y setters
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getApellido() { return apellido; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getCedula() { return cedula; }
-    public void setCedula(String cedula) { this.cedula = cedula; }
+    public String getApellido() {
+        return apellido;
+    }
 
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getCedula() {
+        return cedula;
+    }
 
-    public String getClave() { return clave; }
-    public void setClave(String clave) { this.clave = clave; }
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
 
-    // 🟩 Guarda la persona en una lista dentro de un único JSON
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
+    }
+    /**
+     * Guarda la persona en el archivo JSON evitando duplicados por cédula.
+     */
     public void guardarEnJSON() {
         try {
             File archivo = new File(RUTA_JSON);
             File carpeta = archivo.getParentFile();
-            if (!carpeta.exists()) carpeta.mkdirs();
+            if (!carpeta.exists())
+                carpeta.mkdirs();
 
             ObjectMapper mapper = new ObjectMapper();
             List<Personas> lista;
 
             // Si el archivo ya existe, cargar los usuarios
             if (archivo.exists()) {
-                lista = mapper.readValue(archivo, new TypeReference<List<Personas>>() {});
+                lista = mapper.readValue(archivo, new TypeReference<List<Personas>>() {
+                });
             } else {
                 lista = new ArrayList<>();
             }
@@ -77,30 +118,37 @@ public class Personas {
             if (!existe) {
                 lista.add(this);
                 mapper.writerWithDefaultPrettyPrinter().writeValue(archivo, lista);
-                System.out.println("✅ Usuario guardado correctamente en: " + archivo.getAbsolutePath());
+                Validacion.mensajeusuarioguardado();
             } else {
-                System.out.println("⚠️ El usuario con cédula " + cedula + " ya existe.");
+                Validacion.mensajecedularepetida(RUTA_JSON);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    // 🔹 Cargar todos los usuarios
+    /**
+     * Carga todas las personas registradas desde el archivo JSON.
+     * @return Lista de personas almacenadas.
+     */
     public static List<Personas> cargarTodos() {
         try {
             File archivo = new File(RUTA_JSON);
-            if (!archivo.exists()) return new ArrayList<>();
+            if (!archivo.exists())
+                return new ArrayList<>();
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(archivo, new TypeReference<List<Personas>>() {});
+            return mapper.readValue(archivo, new TypeReference<List<Personas>>() {
+            });
         } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
-
-    // 🔹 Buscar usuario por clave
+    /**
+     * Busca una persona según su clave de acceso.
+     * @param clave Contraseña asociada al usuario.
+     * @return Objeto Personas si existe, o null en caso contrario.
+     */
     public static Personas buscarPorClave(String clave) {
         return cargarTodos().stream()
                 .filter(p -> p.getClave().equals(clave))
@@ -108,4 +156,3 @@ public class Personas {
                 .orElse(null);
     }
 }
-
