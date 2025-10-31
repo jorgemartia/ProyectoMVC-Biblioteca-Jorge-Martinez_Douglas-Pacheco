@@ -31,8 +31,8 @@ import controller.EventosLogin;
 public class LoginView extends JDialog {
 
     private final JPasswordField txtClave;
-    private final JButton btnIngresar;
-    private final JButton btnRegistrar;
+    private final JButton IngresarButton;
+    private final JButton RegistrarButton;
 
     private boolean confirmed = false;
     private boolean registroSelected = false;
@@ -103,31 +103,31 @@ public class LoginView extends JDialog {
         panelCard.add(txtClave, gbc);
 
         // --- Botón Ingresar (Continue) ---
-        btnIngresar = new JButton("Continue");
-        btnIngresar.setBackground(azul);
-        btnIngresar.setForeground(Color.WHITE);
-        btnIngresar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        btnIngresar.setFocusPainted(false);
-        btnIngresar.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
-        btnIngresar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnIngresar.setPreferredSize(new Dimension(260, 45));
+        IngresarButton = new JButton("Continue");
+        IngresarButton.setBackground(azul);
+        IngresarButton.setForeground(Color.WHITE);
+        IngresarButton.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        IngresarButton.setFocusPainted(false);
+        IngresarButton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
+        IngresarButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        IngresarButton.setPreferredSize(new Dimension(260, 45));
 
         gbc.gridy = 4;
         gbc.gridwidth = 2;
-        panelCard.add(btnIngresar, gbc);
+        panelCard.add(IngresarButton, gbc);
 
         // --- Botón Registrar ---
-        btnRegistrar = new JButton("Register");
-        btnRegistrar.setBackground(new Color(25, 118, 210)); // mismo color que Continue
-        btnRegistrar.setForeground(Color.WHITE);
-        btnRegistrar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        btnRegistrar.setFocusPainted(false);
-        btnRegistrar.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
-        btnRegistrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRegistrar.setPreferredSize(new Dimension(260, 45));
+        RegistrarButton = new JButton("Register");
+        RegistrarButton.setBackground(new Color(25, 118, 210)); // mismo color que Continue
+        RegistrarButton.setForeground(Color.WHITE);
+        RegistrarButton.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        RegistrarButton.setFocusPainted(false);
+        RegistrarButton.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25));
+        RegistrarButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        RegistrarButton.setPreferredSize(new Dimension(260, 45));
 
         gbc.gridy = 5; // debajo del botón azul
-        panelCard.add(btnRegistrar, gbc);
+        panelCard.add(RegistrarButton, gbc);
 
         add(panelCard);
 
@@ -140,12 +140,12 @@ public class LoginView extends JDialog {
         return new String(txtClave.getPassword());
     }
 
-    public JButton getBtnIngresar() {
-        return btnIngresar;
+    public JButton getIngresarButton() {
+        return IngresarButton;
     }
 
-    public JButton getBtnRegistrar() {
-        return btnRegistrar;
+    public JButton getRegistrarButton() {
+        return RegistrarButton;
     }
 
     public boolean isConfirmed() {

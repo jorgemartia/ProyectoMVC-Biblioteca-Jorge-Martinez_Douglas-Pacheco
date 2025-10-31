@@ -35,11 +35,11 @@ public class EventosBiblioteca implements ActionListener {
      * Registra los listeners de los botones de la vista.
      */
     private void registrarListeners() {
-        vista.btnRegistrar.addActionListener(this);
-        vista.btnPrestar.addActionListener(this);
-        vista.btnDevolver.addActionListener(this);
-        vista.btnCerrarSesion.addActionListener(this); // Ahora es "Cerrar Sesión"
-        vista.btnLimpiarCatalogo.addActionListener(this);
+        vista.registrarButton.addActionListener(this);
+        vista.prestarButton.addActionListener(this);
+        vista.devolverButton.addActionListener(this);
+        vista.CerrarSesionButton.addActionListener(this); // Ahora es "Cerrar Sesión"
+        vista.LimpiarCatalogoButton.addActionListener(this);
     }
     /**
      * Maneja los eventos de acción generados por la vista.
@@ -49,15 +49,15 @@ public class EventosBiblioteca implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
-        if (src == vista.btnRegistrar) {
+        if (src == vista.registrarButton) {
             manejarRegistrar();
-        } else if (src == vista.btnPrestar) {
+        } else if (src == vista.prestarButton) {
             manejarPrestar();
-        } else if (src == vista.btnDevolver) {
+        } else if (src == vista.devolverButton) {
             manejarDevolver();
-        } else if (src == vista.btnCerrarSesion) { // Ahora cierra sesión
+        } else if (src == vista.CerrarSesionButton) {
             manejarCerrarSesion();
-        } else if (e.getSource() == vista.btnLimpiarCatalogo) {
+        } else if (e.getSource() == vista.LimpiarCatalogoButton) {
             manejarLimpiarCatalogo();
         }
     }

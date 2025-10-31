@@ -91,7 +91,7 @@ public final class Validacion {
     }
 
     public static void mensajeusuarioguardado() {
-        mostrarInfo("✅ Usuario guardado correctamente en: ");
+        mostrarInfo("Usuario guardado correctamente en: ");
     };
 
     public static void mensajecedularepetida(String titulo) {
@@ -99,6 +99,9 @@ public final class Validacion {
     }
     public static void mensajeCantidadInvalida(String titulo) {
         mostrarAdvertencia("debe agregar como minimo un libro");
+    }
+    public static void ejemplarPrestado(String titulo) {
+        mostrarAdvertencia("Ya tienes prestado este libro");
     }
 
     // =======================
@@ -150,7 +153,7 @@ public final class Validacion {
 
             // Si el usuario seleccionó "Registrar"
             if (login.isRegistroSelected()) {
-                RegistroView registro = new RegistroView();
+                RegistroView registro = new RegistroView(login);
                 registro.setVisible(true);
                 // Después de registro, repetir el bucle para intentar login otra vez
                 continue;

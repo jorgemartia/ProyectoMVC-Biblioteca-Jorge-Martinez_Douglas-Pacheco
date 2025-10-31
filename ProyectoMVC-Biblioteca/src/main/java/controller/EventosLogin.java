@@ -22,8 +22,8 @@ public class EventosLogin implements ActionListener {
 
     public EventosLogin(LoginView login) {
         this.login = login;
-        this.login.getBtnIngresar().addActionListener(this);
-        this.login.getBtnRegistrar().addActionListener(this);
+        this.login.getIngresarButton().addActionListener(this);
+        this.login.getRegistrarButton().addActionListener(this);
     }
     /**
      * Escucha las acciones de los botones "Ingresar" y "Registrar".
@@ -32,9 +32,9 @@ public class EventosLogin implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
-        if (src == login.getBtnIngresar()) {
+        if (src == login.getIngresarButton()) {
             manejarLogin();
-        } else if (src == login.getBtnRegistrar()) {
+        } else if (src == login.getRegistrarButton()) {
             abrirRegistro();
         }
     }
@@ -72,7 +72,7 @@ public class EventosLogin implements ActionListener {
             Validacion.mostrarInfo("Bienvenido " + nombreUsuario + ".");
         }
         
-        login.dispose();
+        login.dispose();;
         abrirBiblioteca(rol == AuthService.Role.ADMIN);
     }
     /**
@@ -100,7 +100,7 @@ public class EventosLogin implements ActionListener {
      */
     private void abrirRegistro() {
         login.setVisible(false);
-        RegistroView registro = new RegistroView();
+        RegistroView registro = new RegistroView(login);
         registro.setVisible(true);
         registro.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override

@@ -7,44 +7,60 @@ import model.Libro;
 import util.JsonStorage;
 import util.SessionManager;
 import util.Validacion;
+
 /**
- * comando que permite prestar un libro a un usuario autenticado o anonimo.
+ * Comando que permite prestar un libro a un usuario autenticado o anónimo.
+ * El usuario puede prestar varios libros diferentes pero no más de un ejemplar
+ * igual.
  */
 public class ComandoPrestar implements Comando {
-    private final String isbn;
+    private final String titulo;
 
-    public ComandoPrestar(String isbn) {
-        this.isbn = isbn;
+    public ComandoPrestar(String titulo) {
+        this.titulo = titulo;
     }
 
     /**
      * Ejecuta el préstamo del libro:
      * <ul>
-     *   <li>Obtiene el usuario actual de la sesión.</li>
-     *   <li>Busca el libro por título.</li>
-     *   <li>Intenta prestarlo y actualiza los datos guardados.</li>
+     * <li>Obtiene el usuario actual de la sesión.</li>
+     * <li>Busca el libro por título.</li>
+     * <li>Verifica que el usuario no tenga ya prestado este libro.</li>
+     * <li>Intenta prestarlo y actualiza los datos guardados.</li>
      * </ul>
      */
     @Override
     public void ejecutar() {
         SessionManager session = SessionManager.getInstancia();
         String usuario = session != null ? session.getUsuarioActual() : null;
-        if (usuario == null || usuario.trim().isEmpty()) usuario = "ANONIMO";
+        if (usuario == null || usuario.trim().isEmpty())
+            usuario = "ANONIMO";
 
-        String id = isbn == null ? "" : isbn.trim();
+        String tituloBusqueda = titulo == null ? "" : titulo.trim();
+
+        if (tituloBusqueda.isEmpty()) {
+            Validacion.mensajecamposcompletos();
+            return;
+        }
 
         List<Libro> libros = JsonStorage.cargarLibros();
 
         Libro libro = libros.stream()
                 .filter(l -> {
-                    String ltit = l.getTitulo() == null ? "" : l.getTitulo().trim();
-                    return ltit.equalsIgnoreCase(id);
+                    String tituloLibro = l.getTitulo() == null ? "" : l.getTitulo().trim();
+                    return tituloLibro.equalsIgnoreCase(tituloBusqueda);
                 })
                 .findFirst()
                 .orElse(null);
 
         if (libro == null) {
-            Validacion.mensajeLibroNoEncontrado(id);;
+            Validacion.mensajeLibroNoEncontrado(tituloBusqueda);
+            return;
+        }
+
+        // VERIFICAR SI EL USUARIO YA TIENE ESTE LIBRO PRESTADO
+        if (usuarioYaTieneLibroPrestado(libro, usuario)) {
+            Validacion.ejemplarPrestado(tituloBusqueda);
             return;
         }
 
@@ -56,7 +72,24 @@ public class ComandoPrestar implements Comando {
         } catch (IllegalStateException ex) {
             Validacion.mostrarError(ex.getMessage());
         } catch (Exception ex) {
-            Validacion.mensajeError();;
+            Validacion.mensajeError();
         }
+    }
+
+    /**
+     * Verifica si el usuario ya tiene este libro prestado.
+     * 
+     * @param libro   El libro a verificar
+     * @param usuario El usuario a verificar
+     * @return true si el usuario ya tiene este libro prestado, false en caso
+     *         contrario
+     */
+    private boolean usuarioYaTieneLibroPrestado(Libro libro, String usuario) {
+        if (libro.getUsuariosPrestamo() == null) {
+            return false;
+        }
+
+        return libro.getUsuariosPrestamo().stream()
+                .anyMatch(usuarioPrestamo -> usuarioPrestamo.equals(usuario));
     }
 }

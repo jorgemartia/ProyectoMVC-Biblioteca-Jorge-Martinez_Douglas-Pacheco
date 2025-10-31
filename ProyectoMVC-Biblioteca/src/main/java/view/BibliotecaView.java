@@ -32,13 +32,15 @@ import util.Diseno;
 
 public class BibliotecaView extends JFrame implements InterfazBiblioteca {
     // Componentes de la interfaz
-    private final JTextField tfTituloOp = Diseno.crearTextField(20);
-    private final JTextField tfAutorOp = Diseno.crearTextField(20);
-    private final JTextField tfTituloAdmin = Diseno.crearTextField(20);
-    private final JTextField tfAutorAdmin = Diseno.crearTextField(20);
-    private final JTextField tfIsbnAdmin = Diseno.crearTextField(20);
-    private final JTextField tfCategoriaAdmin = Diseno.crearTextField(20);
-    private final JSpinner spCantidadAdmin = Diseno.crearSpinner(1, 1, 1000, 1);
+    private final JTextField tituloOperacionesField = Diseno.crearTextField(20);
+    private final JTextField autorOperacionesField = Diseno.crearTextField(20);
+
+    private final JTextField tituloAdminField = Diseno.crearTextField(20);
+    private final JTextField autorAdminField = Diseno.crearTextField(20);
+    private final JTextField isbnAdminField = Diseno.crearTextField(20);
+    private final JTextField categoriaAdminField = Diseno.crearTextField(20);
+
+    private final JSpinner cantidadAdminSpinner = Diseno.crearSpinner(1, 1, 1000, 1);
 
     // Tablas
     private JTable tablaPrestamos;
@@ -47,11 +49,11 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
     private DefaultTableModel modelCatalogo;
 
     // Botones
-    public final JButton btnRegistrar = Diseno.crearBoton("📗 Registrar Libro", Diseno.COLOR_EXITO);
-    public final JButton btnPrestar = Diseno.crearBoton("📘 Prestar", Diseno.COLOR_SECUNDARIO);
-    public final JButton btnDevolver = Diseno.crearBoton("📕 Devolver", Diseno.COLOR_PELIGRO);
-    public final JButton btnCerrarSesion = Diseno.crearBoton("🚪 Cerrar Sesión", Diseno.COLOR_CERRAR_SESION);
-    public final JButton btnLimpiarCatalogo = Diseno.crearBoton("🗑️ Limpiar Catálogo", Diseno.COLOR_PELIGRO);
+    public final JButton registrarButton = Diseno.crearBoton("📗 Registrar Libro", Diseno.COLOR_EXITO);
+    public final JButton prestarButton = Diseno.crearBoton("📘 Prestar", Diseno.COLOR_SECUNDARIO);
+    public final JButton devolverButton = Diseno.crearBoton("📕 Devolver", Diseno.COLOR_PELIGRO);
+    public final JButton CerrarSesionButton = Diseno.crearBoton("🚪 Cerrar Sesión", Diseno.COLOR_CERRAR_SESION);
+    public final JButton LimpiarCatalogoButton = Diseno.crearBoton("🗑️ Limpiar Catálogo", Diseno.COLOR_PELIGRO);
 
     private JTabbedPane tabs;
     private JPanel panelAdmin;
@@ -95,13 +97,13 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
         
         panel.add(Diseno.crearLabelNormal("Título del Libro:"), 
                  Diseno.crearConstraints(0, 0, 1));
-        panel.add(tfTituloOp, Diseno.crearConstraints(1, 0, 1));
+        panel.add(tituloOperacionesField, Diseno.crearConstraints(1, 0, 1));
         
         panel.add(Diseno.crearLabelNormal("Autor:"), 
                  Diseno.crearConstraints(0, 1, 1));
-        panel.add(tfAutorOp, Diseno.crearConstraints(1, 1, 1));
+        panel.add(autorOperacionesField, Diseno.crearConstraints(1, 1, 1));
         
-        panel.add(Diseno.crearPanelBotones(btnPrestar, btnDevolver, btnCerrarSesion), 
+        panel.add(Diseno.crearPanelBotones(prestarButton, devolverButton, CerrarSesionButton), 
                  Diseno.crearConstraints(0, 2, 2));
         
         return panel;
@@ -110,16 +112,16 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
     private JPanel crearPanelAdministracion() {
         JPanel panel = Diseno.crearPanelFormulario("Administración de Libros");
         
-        agregarCampoFormulario(panel, "Título:", tfTituloAdmin, 0);
-        agregarCampoFormulario(panel, "Autor:", tfAutorAdmin, 1);
-        agregarCampoFormulario(panel, "ISBN:", tfIsbnAdmin, 2);
-        agregarCampoFormulario(panel, "Categoría:", tfCategoriaAdmin, 3);
+        agregarCampoFormulario(panel, "Título:", tituloAdminField, 0);
+        agregarCampoFormulario(panel, "Autor:", autorAdminField, 1);
+        agregarCampoFormulario(panel, "ISBN:", isbnAdminField, 2);
+        agregarCampoFormulario(panel, "Categoría:", categoriaAdminField, 3);
         
         panel.add(Diseno.crearLabelNormal("Cantidad:"), 
                  Diseno.crearConstraints(0, 4, 1));
-        panel.add(spCantidadAdmin, Diseno.crearConstraints(1, 4, 1));
+        panel.add(cantidadAdminSpinner, Diseno.crearConstraints(1, 4, 1));
         
-        panel.add(Diseno.crearPanelBotones(btnRegistrar, btnLimpiarCatalogo), 
+        panel.add(Diseno.crearPanelBotones(registrarButton, LimpiarCatalogoButton), 
                  Diseno.crearConstraints(0, 5, 2));
         
         return panel;
@@ -167,13 +169,13 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
     }
 
     // Getters de entrada
-    public String getTituloAdminInput() { return tfTituloAdmin.getText(); }
-    public String getAutorAdminInput() { return tfAutorAdmin.getText(); }
-    public String getIsbnAdminInput() { return tfIsbnAdmin.getText(); }
-    public String getCategoriaAdminInput() { return tfCategoriaAdmin.getText(); }
-    public int getCantidadAdminInput() { return (int) spCantidadAdmin.getValue(); }
-    public String getTituloInput() { return tfTituloOp.getText(); }
-    public String getAutorInput() { return tfAutorOp.getText(); }
+    public String getTituloAdminInput() { return tituloAdminField.getText(); }
+    public String getAutorAdminInput() { return autorAdminField.getText(); }
+    public String getIsbnAdminInput() { return isbnAdminField.getText(); }
+    public String getCategoriaAdminInput() { return categoriaAdminField.getText(); }
+    public int getCantidadAdminInput() { return (int) cantidadAdminSpinner.getValue(); }
+    public String getTituloInput() { return tituloOperacionesField.getText(); }
+    public String getAutorInput() { return autorOperacionesField.getText(); }
 
     // Implementación de la interfaz
     @Override
