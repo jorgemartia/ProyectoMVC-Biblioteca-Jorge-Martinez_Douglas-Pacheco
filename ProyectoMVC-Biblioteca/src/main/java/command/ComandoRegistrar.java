@@ -1,49 +1,49 @@
 package command;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import model.Libro;
+import util.JsonStorage;
 import util.Validacion;
+
+import java.util.List;
 
 public class ComandoRegistrar implements Comando {
     private final String titulo;
     private final String autor;
-    private static final List<Libro> libros = new ArrayList<>();
+    private final String isbn;
+    private final String categoria;
 
-    public ComandoRegistrar(String titulo, String autor) {
+    public ComandoRegistrar(String titulo, String autor, String isbn, String categoria) {
         this.titulo = titulo;
         this.autor = autor;
-    }
-
-    private boolean existeLibro(String titulo) {
-        return libros.stream()
-                    .anyMatch(l -> l.getTitulo().equalsIgnoreCase(titulo));
+        this.isbn = isbn;
+        this.categoria = categoria;
     }
 
     @Override
     public void ejecutar() {
-        if (!Validacion.campoNoVacio(titulo, "Título") || 
-            !Validacion.campoNoVacio(autor, "Autor")) {
+        if (!Validacion.campoNoVacio(titulo, "Título") ||
+            !Validacion.campoNoVacio(autor, "Autor") ||
+            !Validacion.campoNoVacio(isbn, "ISBN") ||
+            !Validacion.campoNoVacio(categoria, "Categoría")) {
             return;
         }
 
-        // Verificar que el libro no exista
-        if (existeLibro(titulo)) {
+        List<Libro> libros = JsonStorage.cargarLibros();
+
+        boolean existe = libros.stream().anyMatch(l ->
+                l.getTitulo().equalsIgnoreCase(titulo)
+        );
+
+        if (existe) {
             Validacion.mensajeLibroYaExiste(titulo);
             return;
         }
 
-        // Crear y agregar el nuevo libro
-        Libro libro = new Libro(titulo, autor);
+        Libro libro = new Libro(titulo, autor, isbn, categoria);
         libros.add(libro);
-        
-        // Mostrar mensaje de éxito
+        JsonStorage.guardarLibros(libros);
+
         Validacion.mensajeLibroAgregado(titulo);
     }
-
-    // Método para obtener la lista de libros
-    public static List<Libro> getLibros() {
-        return new ArrayList<>(libros);
-    }
 }
+

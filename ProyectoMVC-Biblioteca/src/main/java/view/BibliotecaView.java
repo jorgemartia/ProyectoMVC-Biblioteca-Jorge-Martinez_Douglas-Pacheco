@@ -12,18 +12,24 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
     private JPanel panelAdmin;
     private final String ADMIN_TAB_TITLE = "Administración";
 
-    // campos para la pestaña de operaciones
+    // Campos para la pestaña de operaciones
     private final JTextField tfTituloOp = new JTextField(20);
     private final JTextField tfAutorOp = new JTextField(20);
-    // campos para la pestaña de administración (registro)
+
+    // Campos para la pestaña de administración (registro)
     private final JTextField tfTituloAdmin = new JTextField(20);
     private final JTextField tfAutorAdmin = new JTextField(20);
+    private final JTextField tfIsbnAdmin = new JTextField(20);
+    private final JTextField tfCategoriaAdmin = new JTextField(20);
 
-    // botones expuestos para el manejador de eventos
+    // Botones expuestos para el manejador de eventos
     public final JButton btnRegistrar = new JButton("Registrar");
     public final JButton btnPrestar = new JButton("Prestar");
     public final JButton btnDevolver = new JButton("Devolver");
     public final JButton btnListar = new JButton("Listar catálogo");
+    public final JButton btnLimpiarCatalogo = new JButton("Limpiar catálogo");
+
+    private JTabbedPane tabs;
 
     public BibliotecaView(Controlador controlador) {
         super("Biblioteca");
@@ -42,76 +48,14 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
         header.setBackground(new Color(45, 118, 232));
         header.setForeground(Color.WHITE);
         header.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-
         add(header, BorderLayout.NORTH);
 
         // Crear pestañas
-        JTabbedPane tabs = new JTabbedPane();
+        tabs = new JTabbedPane();
 
-        // Panel Operaciones (prestar, devolver, listar)
-        JPanel panelOp = new JPanel(new GridBagLayout());
-        panelOp.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        GridBagConstraints gbcOp = new GridBagConstraints();
-        gbcOp.insets = new Insets(6,6,6,6);
-        gbcOp.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel lblTituloOp = new JLabel("Título:");
-        lblTituloOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcOp.gridx = 0; gbcOp.gridy = 0; gbcOp.weightx = 0.0;
-        panelOp.add(lblTituloOp, gbcOp);
-        tfTituloOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcOp.gridx = 1; gbcOp.gridy = 0; gbcOp.weightx = 1.0;
-        panelOp.add(tfTituloOp, gbcOp);
-
-        JLabel lblAutorOp = new JLabel("Autor:");
-        lblAutorOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcOp.gridx = 0; gbcOp.gridy = 1; gbcOp.weightx = 0.0;
-        panelOp.add(lblAutorOp, gbcOp);
-        tfAutorOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcOp.gridx = 1; gbcOp.gridy = 1; gbcOp.weightx = 1.0;
-        panelOp.add(tfAutorOp, gbcOp);
-
-        JPanel panelBtnsOp = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        panelBtnsOp.setBorder(BorderFactory.createEmptyBorder(8,0,0,0));
-        styleButton(btnPrestar);
-        styleButton(btnDevolver);
-        styleButton(btnListar);
-        panelBtnsOp.add(btnPrestar);
-        panelBtnsOp.add(btnDevolver);
-        panelBtnsOp.add(btnListar);
-        gbcOp.gridx = 0; gbcOp.gridy = 2; gbcOp.gridwidth = 2; gbcOp.weightx = 1.0;
-        panelOp.add(panelBtnsOp, gbcOp);
-
-        panelAdmin = new JPanel(new GridBagLayout());
-        panelAdmin.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
-        GridBagConstraints gbcAd = new GridBagConstraints();
-        gbcAd.insets = new Insets(6,6,6,6);
-        gbcAd.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel lblTituloAd = new JLabel("Título:");
-        lblTituloAd.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcAd.gridx = 0; gbcAd.gridy = 0; gbcAd.weightx = 0.0;
-        panelAdmin.add(lblTituloAd, gbcAd);
-        tfTituloAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcAd.gridx = 1; gbcAd.gridy = 0; gbcAd.weightx = 1.0;
-        panelAdmin.add(tfTituloAdmin, gbcAd);
-
-        JLabel lblAutorAd = new JLabel("Autor:");
-        lblAutorAd.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcAd.gridx = 0; gbcAd.gridy = 1; gbcAd.weightx = 0.0;
-        panelAdmin.add(lblAutorAd, gbcAd);
-        tfAutorAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbcAd.gridx = 1; gbcAd.gridy = 1; gbcAd.weightx = 1.0;
-        panelAdmin.add(tfAutorAdmin, gbcAd);
-
-        // Botón registrar destacado
-        styleButton(btnRegistrar);
-        btnRegistrar.setBackground(new Color(34,139,34));
-        JPanel panelBtnsAd = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panelBtnsAd.setBorder(BorderFactory.createEmptyBorder(8,0,0,0));
-        panelBtnsAd.add(btnRegistrar);
-        gbcAd.gridx = 0; gbcAd.gridy = 2; gbcAd.gridwidth = 2; gbcAd.weightx = 1.0;
-        panelAdmin.add(panelBtnsAd, gbcAd);
+        // Panel Operaciones
+        JPanel panelOp = crearPanelOperaciones();
+        panelAdmin = crearPanelAdministracion();
 
         // Añadir pestañas
         tabs.addTab("Operaciones", panelOp);
@@ -119,16 +63,121 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
 
         add(tabs, BorderLayout.CENTER);
 
-        // Guardar referencia a tabs para controlar visibilidad desde Proxy
-        this.tabs = tabs;
-
-        // Ajustes finales
         pack();
         setResizable(false);
         setLocationRelativeTo(null);
     }
 
-    private JTabbedPane tabs;
+    private JPanel crearPanelOperaciones() {
+        JPanel panelOp = new JPanel(new GridBagLayout());
+        panelOp.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel lblTitulo = new JLabel("Título:");
+        lblTitulo.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panelOp.add(lblTitulo, gbc);
+        tfTituloOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        panelOp.add(tfTituloOp, gbc);
+
+        JLabel lblAutor = new JLabel("Autor:");
+        lblAutor.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panelOp.add(lblAutor, gbc);
+        tfAutorOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        panelOp.add(tfAutorOp, gbc);
+
+        JPanel panelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        styleButton(btnPrestar);
+        styleButton(btnDevolver);
+        styleButton(btnListar);
+        panelBtns.add(btnPrestar);
+        panelBtns.add(btnDevolver);
+        panelBtns.add(btnListar);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        panelOp.add(panelBtns, gbc);
+
+        return panelOp;
+    }
+
+    private JPanel crearPanelAdministracion() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Campo Título
+        JLabel lblTitulo = new JLabel("Título:");
+        lblTitulo.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(lblTitulo, gbc);
+        tfTituloAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        panel.add(tfTituloAdmin, gbc);
+
+        // Campo Autor
+        JLabel lblAutor = new JLabel("Autor:");
+        lblAutor.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(lblAutor, gbc);
+        tfAutorAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        panel.add(tfAutorAdmin, gbc);
+
+        // Campo ISBN
+        JLabel lblIsbn = new JLabel("ISBN:");
+        lblIsbn.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(lblIsbn, gbc);
+        tfIsbnAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        panel.add(tfIsbnAdmin, gbc);
+
+        // Campo Categoría
+        JLabel lblCategoria = new JLabel("Categoría:");
+        lblCategoria.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(lblCategoria, gbc);
+        tfCategoriaAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        panel.add(tfCategoriaAdmin, gbc);
+
+        // Botón Registrar
+        styleButton(btnRegistrar);
+        btnRegistrar.setBackground(new Color(34, 139, 34));
+
+        styleButton(btnLimpiarCatalogo);
+        btnLimpiarCatalogo.setBackground(new Color(178, 34, 34));
+        JPanel panelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelBtns.add(btnRegistrar);
+        panelBtns.add(btnLimpiarCatalogo);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        panel.add(panelBtns, gbc);
+
+        return panel;
+
+    }
 
     private void styleButton(JButton b) {
         b.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -139,13 +188,31 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Getters para operaciones (prestar/devolver)
-    public String getTituloInput() { return tfTituloOp.getText(); }
-    public String getAutorInput() { return tfAutorOp.getText(); }
+    // Getters para pestaña Operaciones
+    public String getTituloInput() {
+        return tfTituloOp.getText();
+    }
 
-    // Getters para administración (registro)
-    public String getTituloAdminInput() { return tfTituloAdmin.getText(); }
-    public String getAutorAdminInput() { return tfAutorAdmin.getText(); }
+    public String getAutorInput() {
+        return tfAutorOp.getText();
+    }
+
+    // Getters para pestaña Administración
+    public String getTituloAdminInput() {
+        return tfTituloAdmin.getText();
+    }
+
+    public String getAutorAdminInput() {
+        return tfAutorAdmin.getText();
+    }
+
+    public String getIsbnAdminInput() {
+        return tfIsbnAdmin.getText();
+    }
+
+    public String getCategoriaAdminInput() {
+        return tfCategoriaAdmin.getText();
+    }
 
     // Control de visibilidad de la pestaña de administración
     public void setAdminTabVisible(boolean visible) {
@@ -155,26 +222,25 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
                 tabs.addTab(ADMIN_TAB_TITLE, panelAdmin);
                 index = tabs.indexOfTab(ADMIN_TAB_TITLE);
             }
-            if (index >= 0) tabs.setSelectedIndex(index);
-        } else {
-            if (index >= 0) {
-                tabs.remove(index);
-            }
-            if (tabs.getTabCount() > 0) tabs.setSelectedIndex(0);
+            tabs.setSelectedIndex(index);
+        } else if (index >= 0) {
+            tabs.remove(index);
+            if (tabs.getTabCount() > 0)
+                tabs.setSelectedIndex(0);
         }
     }
 
-    // Mostrar catálogo en una tabla dentro de un diálogo modal
+    // Mostrar catálogo
     public void mostrarCatalogo(List<Libro> libros) {
-        String[] columnas = {"Título", "Autor", "Disponible"};
+        String[] columnas = { "Título", "Autor", "Disponible" };
         Object[][] data = new Object[libros.size()][];
         for (int i = 0; i < libros.size(); i++) {
             Libro l = libros.get(i);
-            data[i] = new Object[]{l.getTitulo(), l.getAutor(), l.isDisponible() ? "Sí" : "No"};
+            data[i] = new Object[] { l.getTitulo(), l.getAutor(), l.isDisponible() ? "Sí" : "No" };
         }
+
         JTable table = new JTable(data, columnas);
         table.setEnabled(false);
-        table.setFillsViewportHeight(true);
         JScrollPane scroll = new JScrollPane(table);
 
         JDialog dlg = new JDialog(this, "Catálogo de libros", true);

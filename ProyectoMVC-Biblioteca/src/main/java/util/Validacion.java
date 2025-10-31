@@ -10,9 +10,9 @@ import view.RegistroView;
 
 public final class Validacion {
     private static final String TITULO = "Biblioteca";
-  
 
-    private Validacion() {}
+    private Validacion() {
+    }
 
     // =======================
     // 🔹 Métodos de mensajes
@@ -29,24 +29,80 @@ public final class Validacion {
         JOptionPane.showMessageDialog(null, mensaje, TITULO, JOptionPane.WARNING_MESSAGE);
     }
 
-    public static void mostrarInfo(String mensaje) { mostrarInfoInterno(mensaje); }
-    public static void mostrarError(String mensaje) { mostrarErrorInterno(mensaje); }
-    public static void mostrarAdvertencia(String mensaje) { mostrarAdvertenciaInterno(mensaje); }
+    public static void mostrarInfo(String mensaje) {
+        mostrarInfoInterno(mensaje);
+    }
+
+    public static void mostrarError(String mensaje) {
+        mostrarErrorInterno(mensaje);
+    }
+
+    public static void mostrarAdvertencia(String mensaje) {
+        mostrarAdvertenciaInterno(mensaje);
+    }
 
     // =======================
     // 🔹 Mensajes de libros
     // =======================
-    public static void mensajeLibroAgregado(String titulo) { mostrarInfo("El libro '" + titulo + "' ha sido agregado correctamente."); }
-    public static void mensajeLibroPrestado(String titulo) { mostrarInfo("El libro '" + titulo + "' fue prestado."); }
-    public static void mensajeLibroDevuelto(String titulo) { mostrarInfo("El libro '" + titulo + "' fue devuelto."); }
-    public static void mensajeLibroYaExiste(String titulo) { mostrarError("El libro '" + titulo + "' ya existe en el catálogo."); }
-    public static void mensajeLibroNoEncontrado(String titulo) { mostrarError("No se encontró el libro '" + titulo + "' en el catálogo."); }
-    public static void mensajeLibroNoDisponible(String titulo) { mostrarError("El libro '" + titulo + "' no está disponible para prestar."); }
-    public static void mensajeLibroYaDisponible(String titulo) { mostrarAdvertencia("El libro '" + titulo + "' ya está disponible."); }
-    public static void mensajeCampoVacio(String campo) { mostrarError("El campo '" + campo + "' no puede estar vacío."); }
-    public static void mensajeCatalogoVacio() { mostrarInfo("El catálogo está vacío."); }
-    public static void mensajeregistroexitoso() { mostrarInfo("Registro Exitoso."); }
-    public static void mensajecamposcompletos() { mostrarAdvertencia("Complete todos los campos."); }
+    public static void mensajeLibroAgregado(String titulo) {
+        mostrarInfo("El libro '" + titulo + "' ha sido agregado correctamente.");
+    }
+
+    public static void mensajeLibronoguardado(String titulo) {
+        mostrarInfo("El libro '" + titulo + "' no ha podido ser guardado.");
+    }
+
+    public static void mensajeLibroPrestado(String titulo) {
+        mostrarInfo("El libro '" + titulo + "' fue prestado.");
+    }
+
+    public static void mensajeLibroDevuelto(String titulo) {
+        mostrarInfo("El libro '" + titulo + "' fue devuelto.");
+    }
+
+    public static void mensajeLibroYaExiste(String titulo) {
+        mostrarError("El libro '" + titulo + "' ya existe en el catálogo.");
+    }
+
+    public static void mensajeLibroNoEncontrado(String titulo) {
+        mostrarError("No se encontró el libro '" + titulo + "' en el catálogo.");
+    }
+
+    public static void mensajeLibroNoDisponible(String titulo) {
+        mostrarError("El libro '" + titulo + "' no está disponible.");
+    }
+
+    public static void mensajeLibroYaDisponible(String titulo) {
+        mostrarAdvertencia("El libro '" + titulo + "' ya está disponible.");
+    }
+
+    public static void mensajeCampoVacio(String campo) {
+        mostrarError("El campo '" + campo + "' no puede estar vacío.");
+    }
+
+    public static void mensajeCatalogoVacio() {
+        mostrarInfo("El catálogo está vacío.");
+    }
+
+    public static void mensajeregistroexitoso() {
+        mostrarInfo("Registro Exitoso.");
+    }
+
+    public static void mensajecamposcompletos() {
+        mostrarAdvertencia("Complete todos los campos.");
+    }
+
+    public static void mensajeusuarioautenticado() {
+        mostrarAdvertencia("No hay usuario autenticado.");
+    }
+
+    public static void mensajeusuarioguardado() {
+        mostrarInfo("✅ Usuario guardado correctamente en: ");
+    };
+
+    public static void mensajecedularepetida(String titulo) {
+        mostrarAdvertencia("la cedula ya existe");
+    }
 
     // =======================
     // 🔹 Validaciones básicas
