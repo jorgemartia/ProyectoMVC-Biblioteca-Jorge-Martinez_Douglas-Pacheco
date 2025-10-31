@@ -36,7 +36,7 @@ public class ComandoPrestar implements Comando {
                 .orElse(null);
 
         if (libro == null) {
-            Validacion.mostrarError("Libro no encontrado.");
+            Validacion.mensajeLibroNoEncontrado(id);;
             return;
         }
 
@@ -49,7 +49,7 @@ public class ComandoPrestar implements Comando {
         } catch (IllegalStateException ex) {
             Validacion.mostrarError(ex.getMessage());
         } catch (Exception ex) {
-            Validacion.mostrarError("Error al prestar el libro.");
+            Validacion.mensajeError();;
         }
     }
 }

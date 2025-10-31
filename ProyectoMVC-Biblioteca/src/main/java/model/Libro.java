@@ -1,14 +1,16 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import util.Validacion;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Libro {
-    private static final String RUTA_JSON = System.getProperty("user.home")
-            + File.separator + "BibliotecaDatos"
-            + File.separator + "libros.json";
+
+    private static final String RUTA_JSON = util.FilePaths.getLibrosPath();
 
     @JsonProperty("titulo")
     private String titulo;
@@ -39,33 +41,42 @@ public class Libro {
     }
 
     // Constructor con parámetros
-    public Libro(String titulo, String autor, String isbn, String categoria) {
+    public Libro(String titulo, String autor, String isbn, String categoria, int cantidadTotal) {
         this.titulo = titulo;
         this.autor = autor;
         this.isbn = isbn;
         this.categoria = categoria;
-        this.cantidadTotal = 1;
-        this.cantidadDisponible = 1;
-        this.usuariosPrestamo = new ArrayList<>();
-        this.disponible = true;
-    }
-
-    // Constructor con cantidad
-    public Libro(String titulo, String autor, String isbn, String categoria, int cantidadTotal) {
-        this(titulo, autor, isbn, categoria);
         this.cantidadTotal = Math.max(1, cantidadTotal);
         this.cantidadDisponible = this.cantidadTotal;
+        this.usuariosPrestamo = new ArrayList<>();
         this.disponible = this.cantidadDisponible > 0;
     }
 
     // Getters / setters mínimos relevantes
-    public String getTitulo() { return titulo; }
-    public String getAutor() { return autor; }
-    public String getIsbn() { return isbn; }
-    public String getCategoria() { return categoria; }
-    public boolean isDisponible() { return disponible; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public int getCantidadTotal() { return cantidadTotal; }
+    public String getAutor() {
+        return autor;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public boolean isDisponible() {
+        return disponible;
+    }
+
+    public int getCantidadTotal() {
+        return cantidadTotal;
+    }
+
     public void setCantidadTotal(int cantidadTotal) {
         this.cantidadTotal = Math.max(1, cantidadTotal);
         if (this.cantidadDisponible > this.cantidadTotal) {
@@ -74,14 +85,18 @@ public class Libro {
         this.disponible = this.cantidadDisponible > 0;
     }
 
-    public int getCantidadDisponible() { return cantidadDisponible; }
+    public int getCantidadDisponible() {
+        return cantidadDisponible;
+    }
+
     public void setCantidadDisponible(int cantidadDisponible) {
         this.cantidadDisponible = Math.max(0, Math.min(cantidadDisponible, this.cantidadTotal));
         this.disponible = this.cantidadDisponible > 0;
     }
 
     public List<String> getUsuariosPrestamo() {
-        if (usuariosPrestamo == null) usuariosPrestamo = new ArrayList<>();
+        if (usuariosPrestamo == null)
+            usuariosPrestamo = new ArrayList<>();
         return usuariosPrestamo;
     }
 
@@ -91,9 +106,10 @@ public class Libro {
 
     // Prestar: añade usuario y decrementa disponibilidad (thread-safe)
     public synchronized void prestar(String usuario) {
-        if (usuario == null) usuario = "DESCONOCIDO";
+        if (usuario == null)
+            usuario = "DESCONOCIDO";
         if (cantidadDisponible <= 0) {
-            throw new IllegalStateException("No hay ejemplares disponibles de este libro.");
+            Validacion.mensajeLibroNoDisponible(usuario);
         }
         // permitir que el mismo usuario tome más de una copia si es necesario
         usuariosPrestamo.add(usuario);
@@ -101,12 +117,39 @@ public class Libro {
         disponible = cantidadDisponible > 0;
     }
 
-    // Devolver: elimina una ocurrencia del usuario; si no está, permite devolución "anónima" hasta no superar total
+    // Devolver: elimina una ocurrencia del usuario; si no está, permite devolución
+    // "anónima" hasta no superar total
     public synchronized boolean devolver(String usuario) {
-        boolean removed = false;
-        if (usuario != null) {
-            removed = usuariosPrestamo.remove(usuario);
+        if (usuario == null) {
+            Validacion.mensajeusuarioautenticado();
         }
+
+        // Verificar si el usuario tiene préstamos activos de este libro
+        boolean usuarioTienePrestamo = false;
+        if (usuariosPrestamo != null) {
+            // Contar cuántas veces aparece el usuario en la lista
+            long count = usuariosPrestamo.stream()
+                    .filter(u -> u.equals(usuario))
+                    .count();
+            usuarioTienePrestamo = count > 0;
+        }
+
+        if (!usuarioTienePrestamo) {
+            Validacion.mensajeDevolucionNOvalida(usuario);
+        }
+
+        // Remover una ocurrencia del usuario
+        boolean removed = false;
+        if (usuariosPrestamo != null) {
+            for (int i = 0; i < usuariosPrestamo.size(); i++) {
+                if (usuariosPrestamo.get(i).equals(usuario)) {
+                    usuariosPrestamo.remove(i);
+                    removed = true;
+                    break;
+                }
+            }
+        }
+
         if (removed) {
             if (cantidadDisponible < cantidadTotal) {
                 cantidadDisponible++;
@@ -114,13 +157,7 @@ public class Libro {
             }
             return true;
         } else {
-            // devolución sin registro del usuario (p.ej. administrador o dato perdido)
-            if (cantidadDisponible < cantidadTotal) {
-                cantidadDisponible++;
-                disponible = cantidadDisponible > 0;
-                return true;
-            }
-            // nada que devolver (ya al tope)
+            // Esto no debería pasar si ya verificamos que tiene préstamos
             return false;
         }
     }
@@ -151,9 +188,9 @@ public class Libro {
             if (!existe) {
                 lista.add(this);
                 mapper.writerWithDefaultPrettyPrinter().writeValue(archivo, lista);
-                System.out.println("✅ Libro guardado correctamente en: " + archivo.getAbsolutePath());
+                Validacion.mensajeLibroAgregado(this.titulo);
             } else {
-                System.out.println("⚠️ El libro con título o ISBN ya existe.");
+                Validacion.mensajeLibroYaExiste(this.titulo);
             }
 
         } catch (java.io.IOException e) {
@@ -191,6 +228,35 @@ public class Libro {
                 .filter(l -> l.getTitulo().equalsIgnoreCase(titulo))
                 .findFirst()
                 .orElse(null);
+    }
+
+    // En la clase Libro, agregar estos métodos:
+
+    /**
+     * Obtiene la cantidad de ejemplares prestados a un usuario específico
+     */
+    public int getCantidadPrestadaAUsuario(String usuario) {
+        if (usuariosPrestamo == null)
+            return 0;
+        return (int) usuariosPrestamo.stream()
+                .filter(u -> u.equals(usuario))
+                .count();
+    }
+
+    /**
+     * Obtiene todos los usuarios que tienen préstamos activos de este libro
+     */
+    public List<String> getUsuariosConPrestamos() {
+        if (usuariosPrestamo == null)
+            return new ArrayList<>();
+        return new ArrayList<>(usuariosPrestamo);
+    }
+
+    /**
+     * Obtiene la cantidad total de préstamos activos
+     */
+    public int getTotalPrestamosActivos() {
+        return usuariosPrestamo != null ? usuariosPrestamo.size() : 0;
     }
 
 }

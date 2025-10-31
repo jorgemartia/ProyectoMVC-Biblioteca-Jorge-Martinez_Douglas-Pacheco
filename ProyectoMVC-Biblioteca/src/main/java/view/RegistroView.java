@@ -3,6 +3,7 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 import controller.EventosRegistro;
+import util.Diseno;
 
 public class RegistroView extends JFrame implements InterfazBiblioteca {
     private JTextField tfNombre;
@@ -24,79 +25,114 @@ public class RegistroView extends JFrame implements InterfazBiblioteca {
 
     private void initComponents() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(400, 420);
+        setSize(500, 550); // Aumenté el tamaño para mejor visualización
         setLocationRelativeTo(null);
+        setResizable(false);
+        getContentPane().setBackground(Diseno.COLOR_FONDO);
         setLayout(new BorderLayout(10, 10));
 
-        JLabel header = new JLabel("Registro de Usuario", SwingConstants.CENTER);
-        header.setFont(new Font("SansSerif", Font.BOLD, 18));
-        header.setOpaque(true);
-        header.setBackground(new Color(45, 118, 232));
-        header.setForeground(Color.WHITE);
-        header.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(header, BorderLayout.NORTH);
+        // Encabezado
+        JPanel headerPanel = Diseno.crearHeaderPanel();
+        JLabel header = Diseno.crearLabelTitulo("Registro de Usuario");
+        headerPanel.add(header, BorderLayout.CENTER);
+        add(headerPanel, BorderLayout.NORTH);
 
-        // Panel central
-        JPanel centerPanel = new JPanel(new GridBagLayout());
+        // Panel central con formulario
+        JPanel centerPanel = Diseno.crearPanelFormulario("Datos del Usuario");
+        centerPanel.setLayout(new GridBagLayout());
+        
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
 
-        tfNombre = new JTextField(15);
-        tfApellido = new JTextField(15);
-        tfCedula = new JTextField(15);
-        tfTelefono = new JTextField(15);
-        tfEmail = new JTextField(15);
-        pfClave = new JPasswordField(15);
+        // Crear campos con tamaño adecuado
+        tfNombre = crearCampoGrande();
+        tfApellido = crearCampoGrande();
+        tfCedula = crearCampoGrande();
+        tfTelefono = crearCampoGrande();
+        tfEmail = crearCampoGrande();
+        pfClave = crearPasswordFieldGrande();
 
-        int y = 0;
-        addLabelAndField(centerPanel, gbc, y++, "Nombre:", tfNombre);
-        addLabelAndField(centerPanel, gbc, y++, "Apellido:", tfApellido);
-        addLabelAndField(centerPanel, gbc, y++, "Cédula:", tfCedula);
-        addLabelAndField(centerPanel, gbc, y++, "Teléfono:", tfTelefono);
-        addLabelAndField(centerPanel, gbc, y++, "Email:", tfEmail);
-        addLabelAndField(centerPanel, gbc, y++, "Clave:", pfClave);
+        // Agregar campos al formulario con mejor distribución
+        agregarCampoFormulario(centerPanel, "Nombre:", tfNombre, 0, gbc);
+        agregarCampoFormulario(centerPanel, "Apellido:", tfApellido, 1, gbc);
+        agregarCampoFormulario(centerPanel, "Cédula:", tfCedula, 2, gbc);
+        agregarCampoFormulario(centerPanel, "Teléfono:", tfTelefono, 3, gbc);
+        agregarCampoFormulario(centerPanel, "Email:", tfEmail, 4, gbc);
+        agregarCampoFormulario(centerPanel, "Clave:", pfClave, 5, gbc);
 
-        add(centerPanel, BorderLayout.CENTER);
+        // Panel para centrar el formulario
+        JPanel formContainer = new JPanel(new GridBagLayout());
+        formContainer.setBackground(Diseno.COLOR_FONDO);
+        formContainer.add(centerPanel);
+        
+        add(formContainer, BorderLayout.CENTER);
 
         // Panel inferior con botones
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnVolver = new JButton("Volver");
-        btnLimpiar = new JButton("Limpiar");
-        btnRegistrar = new JButton("Registrar");
+        btnVolver = Diseno.crearBoton("Volver", Diseno.COLOR_SECUNDARIO);
+        btnLimpiar = Diseno.crearBoton("Limpiar", Diseno.COLOR_ADVERTENCIA);
+        btnRegistrar = Diseno.crearBoton("Registrar", Diseno.COLOR_EXITO);
 
-        // Estilo botones
-        JButton[] botones = {btnVolver, btnLimpiar, btnRegistrar};
-        for (JButton b : botones) {
-            b.setFont(new Font("SansSerif", Font.BOLD, 12));
-            b.setForeground(Color.WHITE);
-            b.setFocusPainted(false);
-        }
+        // Establecer tamaño consistente para botones
+        Dimension buttonSize = new Dimension(120, 40);
+        btnVolver.setPreferredSize(buttonSize);
+        btnLimpiar.setPreferredSize(buttonSize);
+        btnRegistrar.setPreferredSize(buttonSize);
 
-        btnRegistrar.setBackground(new Color(34, 139, 34));
-        btnLimpiar.setBackground(new Color(128, 128, 128));
-        btnVolver.setBackground(new Color(70, 130, 180));
-
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        bottomPanel.setBackground(Diseno.COLOR_FONDO);
         bottomPanel.add(btnVolver);
         bottomPanel.add(btnLimpiar);
         bottomPanel.add(btnRegistrar);
+        
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    private void addLabelAndField(JPanel panel, GridBagConstraints gbc, int y, String label, JComponent field) {
+    private JTextField crearCampoGrande() {
+        JTextField field = new JTextField();
+        field.setFont(Diseno.FUENTE_NORMAL);
+        field.setPreferredSize(new Dimension(250, 35));
+        field.setMinimumSize(new Dimension(250, 35));
+        field.setBorder(Diseno.crearBordeTextField());
+        return field;
+    }
+
+    private JPasswordField crearPasswordFieldGrande() {
+        JPasswordField field = new JPasswordField();
+        field.setFont(Diseno.FUENTE_NORMAL);
+        field.setPreferredSize(new Dimension(250, 35));
+        field.setMinimumSize(new Dimension(250, 35));
+        field.setBorder(Diseno.crearBordeTextField());
+        return field;
+    }
+
+    private void agregarCampoFormulario(JPanel panel, String label, JComponent field, int fila, GridBagConstraints gbc) {
+        JLabel lbl = Diseno.crearLabelNormal(label);
+        lbl.setPreferredSize(new Dimension(80, 25)); // Tamaño fijo para etiquetas
+        
         gbc.gridx = 0;
-        gbc.gridy = y;
-        panel.add(new JLabel(label), gbc);
+        gbc.gridy = fila;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.3;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(lbl, gbc);
+
         gbc.gridx = 1;
+        gbc.gridy = fila;
+        gbc.gridwidth = 2;
+        gbc.weightx = 0.7;
+        gbc.anchor = GridBagConstraints.WEST;
         panel.add(field, gbc);
     }
 
     // Métodos de acceso (getters para el controlador)
-    public String getNombre() { return tfNombre.getText(); }
-    public String getApellido() { return tfApellido.getText(); }
-    public String getCedula() { return tfCedula.getText(); }
-    public String getTelefono() { return tfTelefono.getText(); }
-    public String getEmail() { return tfEmail.getText(); }
+    public String getNombre() { return tfNombre.getText().trim(); }
+    public String getApellido() { return tfApellido.getText().trim(); }
+    public String getCedula() { return tfCedula.getText().trim(); }
+    public String getTelefono() { return tfTelefono.getText().trim(); }
+    public String getEmail() { return tfEmail.getText().trim(); }
     public String getClave() { return new String(pfClave.getPassword()); }
 
     public JButton getBtnRegistrar() { return btnRegistrar; }
@@ -115,5 +151,28 @@ public class RegistroView extends JFrame implements InterfazBiblioteca {
     @Override
     public void mostrar() {
         setVisible(true);
+    }
+    
+    // Implementación de métodos de la interfaz (no utilizados en esta vista)
+    @Override
+    public void actualizarTablaCatalogo(java.util.List<Object[]> datos) {
+        // No aplica para RegistroView
+    }
+
+    @Override
+    public void actualizarTablaPrestamos(java.util.List<Object[]> datos) {
+        // No aplica para RegistroView
+    }
+
+    @Override
+    public void setAdminTabVisible(boolean visible) {
+        // No aplica para RegistroView
+    }
+
+    // Método main para probar la vista
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new RegistroView().mostrar();
+        });
     }
 }

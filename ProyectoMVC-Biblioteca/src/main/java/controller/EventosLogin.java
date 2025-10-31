@@ -4,7 +4,10 @@ import util.Validacion;
 import util.AuthService;
 import util.SessionManager;
 import model.Personas;
+import view.BibliotecaView;
+import view.InterfazBiblioteca;
 import view.LoginView;
+import view.ProxyView;
 import view.RegistroView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -88,9 +91,20 @@ public class EventosLogin implements ActionListener {
     }
 
     private void abrirBiblioteca(boolean esAdmin) {
-        Controlador controlador = new Controlador();
-        view.InterfazBiblioteca proxy = new view.ProxyView(controlador, esAdmin);
-        proxy.mostrar();
-    }
+    // Crear la vista
+    BibliotecaView bibliotecaView = new BibliotecaView();
+    
+    // Crear el controlador con la vista
+    Controlador controlador = new Controlador(bibliotecaView);
+    
+    // Crear y registrar eventos
+    new EventosBiblioteca(controlador, bibliotecaView);
+    
+    // Crear el proxy view
+    InterfazBiblioteca proxy = new ProxyView(controlador, esAdmin);
+    
+    // Mostrar a través del proxy
+    proxy.mostrar();
+}
 }
 

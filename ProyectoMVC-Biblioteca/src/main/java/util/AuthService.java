@@ -20,7 +20,6 @@ public class AuthService {
         // Buscar usuario en el JSON
         Personas usuario = Personas.buscarPorClave(clave);
         if (usuario != null) {
-            System.out.println("✅ Usuario autenticado: " + usuario.getNombre());
             return Role.USUARIO;
         }
 

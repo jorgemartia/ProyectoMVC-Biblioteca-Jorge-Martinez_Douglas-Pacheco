@@ -39,7 +39,7 @@ public class ComandoRegistrar implements Comando {
             return;
         }
 
-        Libro libro = new Libro(titulo, autor, isbn, categoria);
+        Libro libro = new Libro(titulo, autor, isbn, categoria, 1);
         libros.add(libro);
         JsonStorage.guardarLibros(libros);
 

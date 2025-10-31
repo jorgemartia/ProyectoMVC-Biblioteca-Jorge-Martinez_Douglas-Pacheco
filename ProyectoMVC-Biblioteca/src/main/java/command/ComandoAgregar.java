@@ -41,7 +41,7 @@ public class ComandoAgregar implements Comando {
 
         //validemos la cantidad de disponibles que sea mayor a 0
         if (cantidadTotal <= 0) {
-            Validacion.mostrarError("La cantidad total debe ser mayor a 0.");
+            Validacion.mensajeCantidadInvalida(titulo);;
             return;
         }
 
@@ -63,7 +63,7 @@ public class ComandoAgregar implements Comando {
         JsonStorage.guardarLibros(libros);
         guardarLibrosEnJSON(libros);
 
-        Validacion.mensajeLibroAgregado(titulo + "(ejemplares: " + cantidadTotal + ")");
+        Validacion.mensajeLibroAgregado(titulo);;
     }
 
     private void guardarLibrosEnJSON(List<Libro> lista) {
@@ -75,7 +75,7 @@ public class ComandoAgregar implements Comando {
             ObjectMapper mapper = new ObjectMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(archivo, lista);
         } catch (IOException e) {
-            Validacion.mostrarError("Error al guardar los libros en el archivo JSON.");
+            Validacion.mensajeLibronoguardado(RUTA_JSON);;
         }
     }
 }

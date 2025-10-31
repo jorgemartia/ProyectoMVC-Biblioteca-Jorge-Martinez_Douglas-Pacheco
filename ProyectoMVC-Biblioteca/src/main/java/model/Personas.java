@@ -12,9 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Personas {
-    private static final String RUTA_JSON = System.getProperty("user.home") + File.separator + "BibliotecaDatos"
-            + File.separator + "usuarios.json";
-
+    private static final String RUTA_JSON = util.FilePaths.getUsuariosPath();
+    
     @JsonProperty("nombre")
     private String nombre;
     @JsonProperty("apellido")
@@ -116,7 +115,7 @@ public class Personas {
                 mapper.writerWithDefaultPrettyPrinter().writeValue(archivo, lista);
                 Validacion.mensajeusuarioguardado();
             } else {
-             Validacion.mensajecedularepetida(RUTA_JSON);
+                Validacion.mensajecedularepetida(RUTA_JSON);
             }
 
         } catch (IOException e) {

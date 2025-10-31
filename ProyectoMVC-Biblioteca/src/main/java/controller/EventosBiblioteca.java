@@ -13,6 +13,7 @@ import model.Catalogo;
 import util.SessionManager;
 import util.Validacion;
 import view.BibliotecaView;
+import view.LoginView;
 
 public class EventosBiblioteca implements ActionListener {
     private final Controlador controlador;
@@ -28,7 +29,7 @@ public class EventosBiblioteca implements ActionListener {
         vista.btnRegistrar.addActionListener(this);
         vista.btnPrestar.addActionListener(this);
         vista.btnDevolver.addActionListener(this);
-        vista.btnListar.addActionListener(this);
+        vista.btnCerrarSesion.addActionListener(this); // Ahora es "Cerrar Sesión"
         vista.btnLimpiarCatalogo.addActionListener(this);
     }
 
@@ -41,8 +42,8 @@ public class EventosBiblioteca implements ActionListener {
             manejarPrestar();
         } else if (src == vista.btnDevolver) {
             manejarDevolver();
-        } else if (src == vista.btnListar) {
-            manejarListar();
+        } else if (src == vista.btnCerrarSesion) { // Ahora cierra sesión
+            manejarCerrarSesion();
         } else if (e.getSource() == vista.btnLimpiarCatalogo) {
             manejarLimpiarCatalogo();
         }
@@ -57,55 +58,68 @@ public class EventosBiblioteca implements ActionListener {
 
         Comando c = new ComandoAgregar(titulo, autor, isbn, categoria, cantidadTotal);
         c.ejecutar();
-        
-        controlador.getCatalogo().recargarLibros();
+
+        controlador.actualizarTablas();
     }
 
     private void manejarPrestar() {
-        // ✅ OBTENER USUARIO DESDE SESSIONMANAGER
         SessionManager session = SessionManager.getInstancia();
         session.mostrarEstadoSesion();
-        
+
         if (!session.hayUsuarioAutenticado()) {
             Validacion.mensajeusuarioautenticado();
             return;
         }
-        
-        String usuarioActual = session.getUsuarioActual();
         String titulo = vista.getTituloInput();
         Comando c = new ComandoPrestar(titulo);
         c.ejecutar();
-        
-        controlador.getCatalogo().recargarLibros();
+
+        controlador.actualizarTablas();
     }
 
     private void manejarDevolver() {
-        // ✅ OBTENER USUARIO DESDE SESSIONMANAGER
         SessionManager session = SessionManager.getInstancia();
-
         session.mostrarEstadoSesion();
-        
+
         if (!session.hayUsuarioAutenticado()) {
             Validacion.mensajeusuarioautenticado();
             return;
         }
-        
-        String usuarioActual = session.getUsuarioActual();
+
         String titulo = vista.getTituloInput();
         Comando c = new ComandoDevolver(titulo);
         c.ejecutar();
-        
-        controlador.getCatalogo().recargarLibros();
+
+        controlador.actualizarTablas();
     }
 
-    private void manejarListar() {
-        controlador.getCatalogo().recargarLibros();
+    private void manejarCerrarSesion() {
+        int confirm = JOptionPane.showConfirmDialog(
+                vista,
+                "¿Estás seguro de que deseas cerrar sesión?",
+                "Confirmar cierre de sesión",
+                JOptionPane.YES_NO_OPTION);
         
-        if (controlador.getCatalogo().getLibros().isEmpty()) {
-            Validacion.mensajeCatalogoVacio();
-            return;
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Cerrar sesión en SessionManager
+            SessionManager session = SessionManager.getInstancia();
+            String usuario = session.getUsuarioActual();
+            session.cerrarSesion();
+            
+            // Cerrar la ventana actual
+            vista.dispose();
+            
+            // Mostrar mensaje de despedida
+            Validacion.mostrarInfo("¡Hasta pronto " + (usuario != null ? usuario : "usuario") + "!");
+            
+            // Volver al login
+            abrirLogin();
         }
-        vista.mostrarCatalogo(controlador.getCatalogo().getLibros());
+    }
+
+    private void abrirLogin() {
+        LoginView login = new LoginView(null);
+        login.setVisible(true);
     }
 
     private void manejarLimpiarCatalogo() {
@@ -113,10 +127,10 @@ public class EventosBiblioteca implements ActionListener {
                 vista,
                 "¿Estás seguro de que deseas limpiar completamente el catálogo?",
                 "Confirmar limpieza",
-                JOptionPane.YES_NO_OPTION
-        );
+                JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             limpiarCatalogo();
+            controlador.actualizarTablas();
             Validacion.mensajeCatalogoVacio();
         }
     }

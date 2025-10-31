@@ -17,16 +17,20 @@ public class ComandoDevolver implements Comando {
 
     @Override
     public void ejecutar() {
-        // obtener instancia de SessionManager y luego el usuario actual
+        // Obtener usuario actual
         SessionManager session = SessionManager.getInstancia();
         String usuario = session != null ? session.getUsuarioActual() : null;
-        if (usuario == null || usuario.trim().isEmpty()) usuario = "ANONIMO";
+        
+        if (usuario == null || usuario.trim().isEmpty()) {
+            Validacion.mensajeusuarioautenticado();;
+            return;
+        }
 
         String id = isbn == null ? "" : isbn.trim();
 
         List<Libro> libros = JsonStorage.cargarLibros();
 
-        // Buscar por título (nombre) en lugar de isbn
+        // Buscar por título
         Libro libro = libros.stream()
                 .filter(l -> {
                     String ltit = l.getTitulo() == null ? "" : l.getTitulo().trim();
@@ -36,18 +40,24 @@ public class ComandoDevolver implements Comando {
                 .orElse(null);
 
         if (libro == null) {
-            Validacion.mostrarError("Libro no encontrado.");
+            Validacion.mensajeLibroNoEncontrado(id);;
             return;
         }
 
-        boolean ok = libro.devolver(usuario);
-        if (ok) {
-            JsonStorage.guardarLibros(libros);
-            // actualizar el catálogo en memoria para que la vista refleje cambios
-            Catalogo.getInstancia().recargarLibros();
-            Validacion.mensajeLibroDevuelto(libro.getTitulo());
-        } else {
-            Validacion.mostrarAdvertencia("No se registró la devolución (límite alcanzado).");
+        try {
+            boolean ok = libro.devolver(usuario);
+            if (ok) {
+                JsonStorage.guardarLibros(libros);
+                // actualizar el catálogo en memoria para que la vista refleje cambios
+                Catalogo.getInstancia().recargarLibros();
+                Validacion.mensajeLibroDevuelto(libro.getTitulo());
+            } else {
+                Validacion.mensajeDevolucionNOvalida(id);;
+            }
+        } catch (IllegalStateException ex) {
+            Validacion.mostrarError(ex.getMessage());
+        } catch (Exception ex) {
+            Validacion.mensajeError();;
         }
     }
 }
