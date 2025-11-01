@@ -88,7 +88,8 @@ public class EventosBiblioteca implements ActionListener {
             return;
         }
         String titulo = vista.getTituloInput();
-        Comando c = new ComandoPrestar(titulo);
+        String autor = vista.getAutorInput();
+        Comando c = new ComandoPrestar(titulo, autor);
         c.ejecutar();
 
         controlador.actualizarTablas();
@@ -106,7 +107,8 @@ public class EventosBiblioteca implements ActionListener {
         }
 
         String titulo = vista.getTituloInput();
-        Comando c = new ComandoDevolver(titulo);
+        String autor = vista.getAutorInput();
+        Comando c = new ComandoDevolver(titulo, autor);
         c.ejecutar();
 
         controlador.actualizarTablas();

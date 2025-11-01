@@ -9,13 +9,15 @@ import util.SessionManager;
 import util.Validacion;
 
 public class ComandoDevolver implements Comando {
-    private final String isbn;
+    private final String nombre;
+    private final String autor;
 /**
  * comando que permite devolver un libro prestado por un usuario autenticado.
- * @param isbn
+ * @param nombre
  */
-    public ComandoDevolver(String isbn) {
-        this.isbn = isbn;
+    public ComandoDevolver(String nombre, String autor) {
+        this.nombre = nombre;
+        this.autor = autor;
     }
 /**
      * Ejecuta la devolución del libro:
@@ -35,20 +37,27 @@ public class ComandoDevolver implements Comando {
             return;
         }
 
-        String id = isbn == null ? "" : isbn.trim();
+        String tituloBusqueda = nombre == null ? "" : nombre.trim();
+        String autorBusqueda = autor == null ? "" : autor.trim();
+
+        if (tituloBusqueda.isEmpty() || autorBusqueda.isEmpty()) {
+            Validacion.mensajecamposcompletos();;
+            return;
+        }
 
         List<Libro> libros = JsonStorage.cargarLibros();
 
         Libro libro = libros.stream()
                 .filter(l -> {
                     String ltit = l.getTitulo() == null ? "" : l.getTitulo().trim();
-                    return ltit.equalsIgnoreCase(id);
+                    String laut = l.getAutor() == null ? "" : l.getAutor().trim();
+                    return ltit.equalsIgnoreCase(tituloBusqueda)&& laut.equalsIgnoreCase(autorBusqueda);
                 })
                 .findFirst()
                 .orElse(null);
 
         if (libro == null) {
-            Validacion.mensajeLibroNoEncontrado(id);;
+            Validacion.mensajeLibroNoEncontrado(tituloBusqueda);;
             return;
         }
 
@@ -59,7 +68,7 @@ public class ComandoDevolver implements Comando {
                 Catalogo.getInstancia().recargarLibros();
                 Validacion.mensajeLibroDevuelto(libro.getTitulo());
             } else {
-                Validacion.mensajeDevolucionNOvalida(id);;
+                Validacion.mensajeDevolucionNOvalida(tituloBusqueda);;
             }
         } catch (IllegalStateException ex) {
             Validacion.mostrarError(ex.getMessage());

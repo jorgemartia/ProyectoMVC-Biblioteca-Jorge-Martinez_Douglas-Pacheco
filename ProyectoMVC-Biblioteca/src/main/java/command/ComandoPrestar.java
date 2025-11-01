@@ -15,9 +15,11 @@ import util.Validacion;
  */
 public class ComandoPrestar implements Comando {
     private final String titulo;
+    private final String autor;
 
-    public ComandoPrestar(String titulo) {
+    public ComandoPrestar(String titulo, String autor) {
         this.titulo = titulo;
+        this.autor = autor;
     }
 
     /**
@@ -37,8 +39,9 @@ public class ComandoPrestar implements Comando {
             usuario = "ANONIMO";
 
         String tituloBusqueda = titulo == null ? "" : titulo.trim();
+        String autorBusqueda = autor == null ? "" : autor.trim();
 
-        if (tituloBusqueda.isEmpty()) {
+        if (tituloBusqueda.isEmpty()|| autorBusqueda.isEmpty()) {
             Validacion.mensajecamposcompletos();
             return;
         }
@@ -48,7 +51,8 @@ public class ComandoPrestar implements Comando {
         Libro libro = libros.stream()
                 .filter(l -> {
                     String tituloLibro = l.getTitulo() == null ? "" : l.getTitulo().trim();
-                    return tituloLibro.equalsIgnoreCase(tituloBusqueda);
+                    String autorLibro = l.getAutor() == null ? "" : l.getAutor().trim();
+                    return tituloLibro.equalsIgnoreCase(tituloBusqueda)&& autorLibro.equalsIgnoreCase(autorBusqueda);
                 })
                 .findFirst()
                 .orElse(null);

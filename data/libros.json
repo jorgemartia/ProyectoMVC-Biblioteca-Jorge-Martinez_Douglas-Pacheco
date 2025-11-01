@@ -1,0 +1,14 @@
+[
+  {
+    "titulo": "Principito",
+    "autor": "Antonio",
+    "isbn": "1234",
+    "categoria": "Novela",
+    "disponible": true,
+    "usuariosPrestamo": [
+      "dou neg"
+    ],
+    "cantidadTotal": 2,
+    "cantidadDisponible": 1
+  }
+]
