@@ -187,6 +187,16 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
             tabs.addTab("Administración", panelAdmin);
         }
     }
+    @Override
+public void setPrestamosTabVisible(boolean visible) {
+    int index = tabs.indexOfTab("Préstamos");
+    if (!visible && index >= 0) {
+        tabs.remove(index);
+    } else if (visible && index < 0) {
+        // Si quisieras volver a agregar la pestaña (opcional)
+        tabs.insertTab("Préstamos", null, crearPanelPrestamos(), null, 2);
+    }
+}
 
     @Override
     public void actualizarTablaPrestamos(java.util.List<Object[]> datos) {

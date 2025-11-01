@@ -63,4 +63,8 @@ public class Controlador {
     public void setAdminTabVisible(boolean visible) {
         vista.setAdminTabVisible(visible);
     }
+
+    public void setPrestamosTabVisible(boolean visible) {
+    vista.setPrestamosTabVisible(visible);
+}
 }

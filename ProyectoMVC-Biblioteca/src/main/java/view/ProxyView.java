@@ -24,6 +24,7 @@ public class ProxyView implements InterfazBiblioteca {
     @Override
     public void mostrar() {
         controlador.setAdminTabVisible(esAdmin);
+        controlador.setPrestamosTabVisible(esAdmin);
         controlador.iniciar();
     }
 
@@ -43,6 +44,11 @@ public class ProxyView implements InterfazBiblioteca {
     public void setAdminTabVisible(boolean visible) {
         controlador.setAdminTabVisible(visible);
     }
+
+    @Override
+public void setPrestamosTabVisible(boolean visible) {
+    controlador.setPrestamosTabVisible(visible);
+}
 }
 
 

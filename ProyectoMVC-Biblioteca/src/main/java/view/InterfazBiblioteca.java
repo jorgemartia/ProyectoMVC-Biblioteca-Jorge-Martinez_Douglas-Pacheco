@@ -10,4 +10,5 @@ public interface InterfazBiblioteca {
     void actualizarTablaCatalogo(java.util.List<Object[]> datos);
     void actualizarTablaPrestamos(java.util.List<Object[]> datos);
     void setAdminTabVisible(boolean visible);
+    void setPrestamosTabVisible(boolean visible);
 }

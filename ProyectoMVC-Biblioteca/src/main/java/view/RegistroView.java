@@ -232,6 +232,11 @@ public class RegistroView extends JFrame implements InterfazBiblioteca {
         // No aplica para RegistroView
     }
 
+    @Override
+public void setPrestamosTabVisible(boolean visible) {
+    // No aplica para RegistroView
+}
+
     // Método main para probar la vista
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
