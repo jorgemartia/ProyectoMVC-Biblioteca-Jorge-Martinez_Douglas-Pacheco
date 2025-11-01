@@ -5,4 +5,11 @@
   "telefono" : "34422332",
   "email" : "jj@gmail.com",
   "clave" : "d123"
+}, {
+  "nombre" : "jorge",
+  "apellido" : "anaya",
+  "cedula" : "46564",
+  "telefono" : "46654",
+  "email" : "jorge@gmail.com",
+  "clave" : "j123"
 } ]

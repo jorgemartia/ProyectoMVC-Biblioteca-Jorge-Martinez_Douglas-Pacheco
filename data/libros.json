@@ -10,5 +10,15 @@
     ],
     "cantidadTotal": 2,
     "cantidadDisponible": 1
+  },
+  {
+    "titulo": "cien años de soledad",
+    "autor": "garcia",
+    "isbn": "4569",
+    "categoria": "novela",
+    "disponible": true,
+    "usuariosPrestamo": [],
+    "cantidadTotal": 2,
+    "cantidadDisponible": 2
   }
 ]

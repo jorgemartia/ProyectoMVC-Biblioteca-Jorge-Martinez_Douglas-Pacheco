@@ -41,7 +41,7 @@ public class ComandoPrestar implements Comando {
         String tituloBusqueda = titulo == null ? "" : titulo.trim();
         String autorBusqueda = autor == null ? "" : autor.trim();
 
-        if (tituloBusqueda.isEmpty()|| autorBusqueda.isEmpty()) {
+        if (tituloBusqueda.isEmpty() || autorBusqueda.isEmpty()) {
             Validacion.mensajecamposcompletos();
             return;
         }
@@ -52,7 +52,7 @@ public class ComandoPrestar implements Comando {
                 .filter(l -> {
                     String tituloLibro = l.getTitulo() == null ? "" : l.getTitulo().trim();
                     String autorLibro = l.getAutor() == null ? "" : l.getAutor().trim();
-                    return tituloLibro.equalsIgnoreCase(tituloBusqueda)&& autorLibro.equalsIgnoreCase(autorBusqueda);
+                    return tituloLibro.equalsIgnoreCase(tituloBusqueda) && autorLibro.equalsIgnoreCase(autorBusqueda);
                 })
                 .findFirst()
                 .orElse(null);
@@ -65,6 +65,17 @@ public class ComandoPrestar implements Comando {
         // VERIFICAR SI EL USUARIO YA TIENE ESTE LIBRO PRESTADO
         if (usuarioYaTieneLibroPrestado(libro, usuario)) {
             Validacion.ejemplarPrestado(tituloBusqueda);
+            return;
+        }
+        // VERIFICAR SI EL USUARIO YA TIENE ESTE LIBRO PRESTADO
+        if (usuarioYaTieneLibroPrestado(libro, usuario)) {
+            Validacion.ejemplarPrestado(tituloBusqueda);
+            return;
+        }
+
+        // VERIFICAR DISPONIBILIDAD ANTES DE PRESTAR
+        if (libro.getCantidadDisponible() <= 0) {
+            Validacion.mensajeLibroNoDisponible(tituloBusqueda);
             return;
         }
 

@@ -143,7 +143,7 @@ public class Libro {
         }
 
         if (!usuarioTienePrestamo) {
-            Validacion.mensajeDevolucionNOvalida(usuario);
+            return false;
         }
 
         // Remover una ocurrencia del usuario
