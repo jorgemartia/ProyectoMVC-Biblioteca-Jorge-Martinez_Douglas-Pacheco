@@ -1,39 +1,65 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import controller.Controlador;
-import model.Libro;
+import java.awt.BorderLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import util.Diseno;
+
+
+/**
+ * Vista principal del sistema de biblioteca.
+ * 
+ * Proporciona la interfaz gráfica para gestionar las operaciones de la biblioteca,
+ * incluyendo préstamos, devoluciones, registro de libros y visualización del catálogo.
+ * 
+ * La vista utiliza pestañas (JTabbedPane) para separar las secciones de:
+ * - Operaciones de préstamo y devolución.
+ * - Catálogo completo de libros.
+ * - Historial de préstamos activos.
+ * - Administración (visible solo para administradores).
+ * 
+ * Implementa la interfaz {@code InterfazBiblioteca} para ser controlada por la capa Controlador.
+ */
 
 public class BibliotecaView extends JFrame implements InterfazBiblioteca {
-    @SuppressWarnings("unused")
-    private final Controlador controlador;
-    private JPanel panelAdmin;
-    private final String ADMIN_TAB_TITLE = "Administración";
+    // Componentes de la interfaz
+    private final JTextField tituloOperacionesField = Diseno.crearTextField(20);
+    private final JTextField autorOperacionesField = Diseno.crearTextField(20);
 
-    // Campos para la pestaña de operaciones
-    private final JTextField tfTituloOp = new JTextField(20);
-    private final JTextField tfAutorOp = new JTextField(20);
+    private final JTextField tituloAdminField = Diseno.crearTextField(20);
+    private final JTextField autorAdminField = Diseno.crearTextField(20);
+    private final JTextField isbnAdminField = Diseno.crearTextField(20);
+    private final JTextField categoriaAdminField = Diseno.crearTextField(20);
 
-    // Campos para la pestaña de administración (registro)
-    private final JTextField tfTituloAdmin = new JTextField(20);
-    private final JTextField tfAutorAdmin = new JTextField(20);
-    private final JTextField tfIsbnAdmin = new JTextField(20);
-    private final JTextField tfCategoriaAdmin = new JTextField(20);
+    private final JSpinner cantidadAdminSpinner = Diseno.crearSpinner(1, 1, 1000, 1);
 
-    // Botones expuestos para el manejador de eventos
-    public final JButton btnRegistrar = new JButton("Registrar");
-    public final JButton btnPrestar = new JButton("Prestar");
-    public final JButton btnDevolver = new JButton("Devolver");
-    public final JButton btnListar = new JButton("Listar catálogo");
-    public final JButton btnLimpiarCatalogo = new JButton("Limpiar catálogo");
+    // Tablas
+    private JTable tablaPrestamos;
+    private JTable tablaCatalogo;
+    private DefaultTableModel modelPrestamos;
+    private DefaultTableModel modelCatalogo;
+
+    // Botones
+    public final JButton registrarButton = Diseno.crearBoton("📗 Registrar Libro", Diseno.COLOR_EXITO);
+    public final JButton prestarButton = Diseno.crearBoton("📘 Prestar", Diseno.COLOR_SECUNDARIO);
+    public final JButton devolverButton = Diseno.crearBoton("📕 Devolver", Diseno.COLOR_PELIGRO);
+    public final JButton CerrarSesionButton = Diseno.crearBoton("🚪 Cerrar Sesión", Diseno.COLOR_CERRAR_SESION);
+    public final JButton LimpiarCatalogoButton = Diseno.crearBoton("🗑️ Limpiar Catálogo", Diseno.COLOR_PELIGRO);
 
     private JTabbedPane tabs;
+    private JPanel panelAdmin;
 
-    public BibliotecaView(Controlador controlador) {
+    public BibliotecaView() {
         super("Biblioteca");
-        this.controlador = controlador;
         initComponents();
     }
 
@@ -41,213 +67,156 @@ public class BibliotecaView extends JFrame implements InterfazBiblioteca {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Header
-        JLabel header = new JLabel("Mi Biblioteca", SwingConstants.CENTER);
-        header.setFont(new Font("SansSerif", Font.BOLD, 22));
-        header.setOpaque(true);
-        header.setBackground(new Color(45, 118, 232));
-        header.setForeground(Color.WHITE);
-        header.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        add(header, BorderLayout.NORTH);
+        // Encabezado
+        JPanel headerPanel = Diseno.crearHeaderPanel();
+        headerPanel.add(Diseno.crearLabelTitulo("📘 Mi Biblioteca"), BorderLayout.NORTH);
+        headerPanel.add(Diseno.crearLabelSubtitulo("Sistema de Gestión de Libros"), BorderLayout.CENTER);
+        add(headerPanel, BorderLayout.NORTH);
 
-        // Crear pestañas
-        tabs = new JTabbedPane();
-
-        // Panel Operaciones
-        JPanel panelOp = crearPanelOperaciones();
+        // Pestañas
+        tabs = Diseno.crearTabbedPane();
+        tabs.addTab("Operaciones", crearPanelOperaciones());
+        tabs.addTab("Catálogo", crearPanelCatalogo());
+        tabs.addTab("Préstamos", crearPanelPrestamos());
         panelAdmin = crearPanelAdministracion();
-
-        // Añadir pestañas
-        tabs.addTab("Operaciones", panelOp);
-        tabs.addTab(ADMIN_TAB_TITLE, panelAdmin);
-
+        tabs.addTab("Administración", panelAdmin);
+        
         add(tabs, BorderLayout.CENTER);
 
-        pack();
-        setResizable(false);
+        // Pie de página
+        add(Diseno.crearPiePagina("Sistema de Biblioteca v2.0 - Haz clic en 'Cerrar Sesión' para salir"), 
+            BorderLayout.SOUTH);
+
+        setSize(900, 600);
         setLocationRelativeTo(null);
+        setResizable(true);
     }
 
     private JPanel crearPanelOperaciones() {
-        JPanel panelOp = new JPanel(new GridBagLayout());
-        panelOp.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel lblTitulo = new JLabel("Título:");
-        lblTitulo.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panelOp.add(lblTitulo, gbc);
-        tfTituloOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panelOp.add(tfTituloOp, gbc);
-
-        JLabel lblAutor = new JLabel("Autor:");
-        lblAutor.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panelOp.add(lblAutor, gbc);
-        tfAutorOp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        panelOp.add(tfAutorOp, gbc);
-
-        JPanel panelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        styleButton(btnPrestar);
-        styleButton(btnDevolver);
-        styleButton(btnListar);
-        panelBtns.add(btnPrestar);
-        panelBtns.add(btnDevolver);
-        panelBtns.add(btnListar);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        panelOp.add(panelBtns, gbc);
-
-        return panelOp;
+        JPanel panel = Diseno.crearPanelFormulario("Operaciones de Biblioteca");
+        
+        panel.add(Diseno.crearLabelNormal("Título del Libro:"), 
+                 Diseno.crearConstraints(0, 0, 1));
+        panel.add(tituloOperacionesField, Diseno.crearConstraints(1, 0, 1));
+        
+        panel.add(Diseno.crearLabelNormal("Autor:"), 
+                 Diseno.crearConstraints(0, 1, 1));
+        panel.add(autorOperacionesField, Diseno.crearConstraints(1, 1, 1));
+        
+        panel.add(Diseno.crearPanelBotones(prestarButton, devolverButton, CerrarSesionButton), 
+                 Diseno.crearConstraints(0, 2, 2));
+        
+        return panel;
     }
 
     private JPanel crearPanelAdministracion() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel panel = Diseno.crearPanelFormulario("Administración de Libros");
+        
+        agregarCampoFormulario(panel, "Título:", tituloAdminField, 0);
+        agregarCampoFormulario(panel, "Autor:", autorAdminField, 1);
+        agregarCampoFormulario(panel, "ISBN:", isbnAdminField, 2);
+        agregarCampoFormulario(panel, "Categoría:", categoriaAdminField, 3);
+        
+        panel.add(Diseno.crearLabelNormal("Cantidad:"), 
+                 Diseno.crearConstraints(0, 4, 1));
+        panel.add(cantidadAdminSpinner, Diseno.crearConstraints(1, 4, 1));
+        
+        panel.add(Diseno.crearPanelBotones(registrarButton, LimpiarCatalogoButton), 
+                 Diseno.crearConstraints(0, 5, 2));
+        
+        return panel;
+    }
 
-        // Campo Título
-        JLabel lblTitulo = new JLabel("Título:");
-        lblTitulo.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(lblTitulo, gbc);
-        tfTituloAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel.add(tfTituloAdmin, gbc);
+    private void agregarCampoFormulario(JPanel panel, String label, JTextField field, int fila) {
+        panel.add(Diseno.crearLabelNormal(label), Diseno.crearConstraints(0, fila, 1));
+        panel.add(field, Diseno.crearConstraints(1, fila, 1));
+    }
 
-        // Campo Autor
-        JLabel lblAutor = new JLabel("Autor:");
-        lblAutor.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(lblAutor, gbc);
-        tfAutorAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        panel.add(tfAutorAdmin, gbc);
+    private JPanel crearPanelPrestamos() {
+        JPanel panel = Diseno.crearPanelCard();
+        panel.setLayout(new BorderLayout());
 
-        // Campo ISBN
-        JLabel lblIsbn = new JLabel("ISBN:");
-        lblIsbn.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        panel.add(lblIsbn, gbc);
-        tfIsbnAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        panel.add(tfIsbnAdmin, gbc);
-
-        // Campo Categoría
-        JLabel lblCategoria = new JLabel("Categoría:");
-        lblCategoria.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        panel.add(lblCategoria, gbc);
-        tfCategoriaAdmin.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        panel.add(tfCategoriaAdmin, gbc);
-
-        // Botón Registrar
-        styleButton(btnRegistrar);
-        btnRegistrar.setBackground(new Color(34, 139, 34));
-
-        styleButton(btnLimpiarCatalogo);
-        btnLimpiarCatalogo.setBackground(new Color(178, 34, 34));
-        JPanel panelBtns = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panelBtns.add(btnRegistrar);
-        panelBtns.add(btnLimpiarCatalogo);
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        panel.add(panelBtns, gbc);
+        String[] columnas = {"Usuario", "ID Usuario", "Título Libro", "Autor", "ISBN", "Categoría", "Cantidad Prestada"};
+        modelPrestamos = Diseno.crearModeloTabla(columnas);
+        tablaPrestamos = Diseno.crearTabla(new Object[][]{}, columnas);
+        tablaPrestamos.setModel(modelPrestamos);
+        
+        JLabel titulo = Diseno.crearLabelTituloPanel("📋 Historial de Préstamos Activos", 0);
+        titulo.setName("tituloPrestamos");
+        
+        panel.add(titulo, BorderLayout.NORTH);
+        panel.add(Diseno.crearScrollPane(tablaPrestamos), BorderLayout.CENTER);
 
         return panel;
-
     }
 
-    private void styleButton(JButton b) {
-        b.setFont(new Font("SansSerif", Font.BOLD, 12));
-        b.setFocusPainted(false);
-        b.setBackground(new Color(70, 130, 180));
-        b.setForeground(Color.WHITE);
-        b.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    private JPanel crearPanelCatalogo() {
+        JPanel panel = Diseno.crearPanelCard();
+        panel.setLayout(new BorderLayout());
+
+        String[] columnas = {"Título", "Autor", "ISBN", "Categoría", "Cantidad Total", "Cantidad Disponible", "Disponible"};
+        modelCatalogo = Diseno.crearModeloTabla(columnas);
+        tablaCatalogo = Diseno.crearTabla(new Object[][]{}, columnas);
+        tablaCatalogo.setModel(modelCatalogo);
+        
+        JLabel titulo = Diseno.crearLabelTituloPanel("📚 Catálogo Completo de Libros", 0);
+        titulo.setName("tituloCatalogo");
+        
+        panel.add(titulo, BorderLayout.NORTH);
+        panel.add(Diseno.crearScrollPane(tablaCatalogo), BorderLayout.CENTER);
+
+        return panel;
     }
 
-    // Getters para pestaña Operaciones
-    public String getTituloInput() {
-        return tfTituloOp.getText();
-    }
+    // Getters de entrada
+    public String getTituloAdminInput() { return tituloAdminField.getText(); }
+    public String getAutorAdminInput() { return autorAdminField.getText(); }
+    public String getIsbnAdminInput() { return isbnAdminField.getText(); }
+    public String getCategoriaAdminInput() { return categoriaAdminField.getText(); }
+    public int getCantidadAdminInput() { return (int) cantidadAdminSpinner.getValue(); }
+    public String getTituloInput() { return tituloOperacionesField.getText(); }
+    public String getAutorInput() { return autorOperacionesField.getText(); }
 
-    public String getAutorInput() {
-        return tfAutorOp.getText();
-    }
-
-    // Getters para pestaña Administración
-    public String getTituloAdminInput() {
-        return tfTituloAdmin.getText();
-    }
-
-    public String getAutorAdminInput() {
-        return tfAutorAdmin.getText();
-    }
-
-    public String getIsbnAdminInput() {
-        return tfIsbnAdmin.getText();
-    }
-
-    public String getCategoriaAdminInput() {
-        return tfCategoriaAdmin.getText();
-    }
-
-    // Control de visibilidad de la pestaña de administración
+    // Implementación de la interfaz
+    @Override
     public void setAdminTabVisible(boolean visible) {
-        int index = tabs.indexOfTab(ADMIN_TAB_TITLE);
-        if (visible) {
-            if (index < 0) {
-                tabs.addTab(ADMIN_TAB_TITLE, panelAdmin);
-                index = tabs.indexOfTab(ADMIN_TAB_TITLE);
-            }
-            tabs.setSelectedIndex(index);
-        } else if (index >= 0) {
+        int index = tabs.indexOfTab("Administración");
+        if (!visible && index >= 0) {
             tabs.remove(index);
-            if (tabs.getTabCount() > 0)
-                tabs.setSelectedIndex(0);
+        } else if (visible && index < 0) {
+            tabs.addTab("Administración", panelAdmin);
         }
     }
 
-    // Mostrar catálogo
-    public void mostrarCatalogo(List<Libro> libros) {
-        String[] columnas = { "Título", "Autor", "Disponible" };
-        Object[][] data = new Object[libros.size()][];
-        for (int i = 0; i < libros.size(); i++) {
-            Libro l = libros.get(i);
-            data[i] = new Object[] { l.getTitulo(), l.getAutor(), l.isDisponible() ? "Sí" : "No" };
+    @Override
+    public void actualizarTablaPrestamos(java.util.List<Object[]> datos) {
+        modelPrestamos.setRowCount(0);
+        for (Object[] prestamo : datos) {
+            modelPrestamos.addRow(prestamo);
         }
+        actualizarTituloPanel("Préstamos", "📋 Historial de Préstamos Activos", datos.size());
+    }
 
-        JTable table = new JTable(data, columnas);
-        table.setEnabled(false);
-        JScrollPane scroll = new JScrollPane(table);
+    @Override
+    public void actualizarTablaCatalogo(java.util.List<Object[]> datos) {
+        modelCatalogo.setRowCount(0);
+        for (Object[] libro : datos) {
+            modelCatalogo.addRow(libro);
+        }
+        actualizarTituloPanel("Catálogo", "📚 Catálogo Completo de Libros", datos.size());
+    }
 
-        JDialog dlg = new JDialog(this, "Catálogo de libros", true);
-        dlg.getContentPane().add(scroll);
-        dlg.setSize(600, 300);
-        dlg.setLocationRelativeTo(this);
-        dlg.setVisible(true);
+    private void actualizarTituloPanel(String nombreTab, String textoBase, int cantidad) {
+        int index = tabs.indexOfTab(nombreTab);
+        if (index >= 0) {
+            JPanel panel = (JPanel) tabs.getComponentAt(index);
+            if (panel != null) {
+                JLabel titulo = (JLabel) ((BorderLayout) panel.getLayout()).getLayoutComponent(BorderLayout.NORTH);
+                if (titulo != null) {
+                    titulo.setText(textoBase + " (" + cantidad + ")");
+                }
+            }
+        }
     }
 
     @Override

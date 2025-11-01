@@ -20,9 +20,7 @@ import java.util.List;
  */
 public class JsonStorage {
 
-    private static final String RUTA_JSON = System.getProperty("user.home")
-            + File.separator + "BibliotecaDatos"
-            + File.separator + "libros.json";
+    private static final String RUTA_JSON = util.FilePaths.getLibrosPath();
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

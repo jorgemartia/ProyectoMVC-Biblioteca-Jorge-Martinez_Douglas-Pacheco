@@ -1,17 +1,19 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import util.Validacion;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Representa un libro dentro del sistema de biblioteca.
+ * Maneja operaciones como préstamo, devolución y persistencia en JSON.
+ */
 public class Libro {
-    private static final String RUTA_JSON = System.getProperty("user.home")
-            + File.separator + "BibliotecaDatos"
-            + File.separator + "libros.json";
+
+    private static final String RUTA_JSON = util.FilePaths.getLibrosPath();
 
     @JsonProperty("titulo")
     private String titulo;
@@ -23,71 +25,154 @@ public class Libro {
     private String categoria;
     @JsonProperty("disponible")
     private boolean disponible;
-    private String usuarioPrestamo;
+
+    // Reemplazado el campo único por una lista de usuarios
+    @JsonProperty("usuariosPrestamo")
+    private List<String> usuariosPrestamo = new ArrayList<>();
+
+    @JsonProperty("cantidadTotal")
+    private int cantidadTotal;
+    @JsonProperty("cantidadDisponible")
+    private int cantidadDisponible;
 
     // Constructor vacío para Jackson
     public Libro() {
+        this.cantidadTotal = 1;
+        this.cantidadDisponible = 1;
+        this.usuariosPrestamo = new ArrayList<>();
+        this.disponible = true;
     }
 
     // Constructor con parámetros
-    public Libro(String titulo, String autor, String isbn, String categoria) {
+    public Libro(String titulo, String autor, String isbn, String categoria, int cantidadTotal) {
         this.titulo = titulo;
         this.autor = autor;
         this.isbn = isbn;
         this.categoria = categoria;
-        this.disponible = true;
+        this.cantidadTotal = Math.max(1, cantidadTotal);
+        this.cantidadDisponible = this.cantidadTotal;
+        this.usuariosPrestamo = new ArrayList<>();
+        this.disponible = this.cantidadDisponible > 0;
     }
 
-    // Getters y setters
+    // Getters / setters mínimos relevantes
     public String getTitulo() {
         return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
     }
 
     public String getAutor() {
         return autor;
     }
 
-    public void setAutor(String autor) {
-        this.autor = autor;
-    }
-
     public String getIsbn() {
         return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
     }
 
     public String getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
     public boolean isDisponible() {
         return disponible;
     }
 
-    public void setDisponible(boolean disponible) {
-        this.disponible = disponible;
+    public int getCantidadTotal() {
+        return cantidadTotal;
     }
 
-    public String getUsuarioPrestamo() {
-        return usuarioPrestamo;
+    public void setCantidadTotal(int cantidadTotal) {
+        this.cantidadTotal = Math.max(1, cantidadTotal);
+        if (this.cantidadDisponible > this.cantidadTotal) {
+            this.cantidadDisponible = this.cantidadTotal;
+        }
+        this.disponible = this.cantidadDisponible > 0;
     }
 
-    public void setUsuarioPrestamo(String usuarioPrestamo) {
-        this.usuarioPrestamo = usuarioPrestamo;
+    public int getCantidadDisponible() {
+        return cantidadDisponible;
     }
 
-    // 🔹 Guardar libro en el JSON
+    public void setCantidadDisponible(int cantidadDisponible) {
+        this.cantidadDisponible = Math.max(0, Math.min(cantidadDisponible, this.cantidadTotal));
+        this.disponible = this.cantidadDisponible > 0;
+    }
+
+    public List<String> getUsuariosPrestamo() {
+        if (usuariosPrestamo == null)
+            usuariosPrestamo = new ArrayList<>();
+        return usuariosPrestamo;
+    }
+
+    public void setUsuariosPrestamo(List<String> usuariosPrestamo) {
+        this.usuariosPrestamo = usuariosPrestamo == null ? new ArrayList<>() : usuariosPrestamo;
+    }
+    /**
+     * Registra el préstamo de una copia del libro a un usuario.
+     * @param usuario nombre del usuario que toma el préstamo
+     */
+    public synchronized void prestar(String usuario) {
+        if (usuario == null)
+            usuario = "DESCONOCIDO";
+        if (cantidadDisponible <= 0) {
+            Validacion.mensajeLibroNoDisponible(usuario);
+        }
+        // permitir que el mismo usuario tome más de una copia si es necesario
+        usuariosPrestamo.add(usuario);
+        cantidadDisponible--;
+        disponible = cantidadDisponible > 0;
+    }
+
+    /**
+     * Registra la devolución de un libro por parte de un usuario.
+     * @param usuario nombre del usuario que devuelve
+     * @return true si la devolución fue exitosa
+     */
+    public synchronized boolean devolver(String usuario) {
+        if (usuario == null) {
+            Validacion.mensajeusuarioautenticado();
+        }
+
+        // Verificar si el usuario tiene préstamos activos de este libro
+        boolean usuarioTienePrestamo = false;
+        if (usuariosPrestamo != null) {
+            // Contar cuántas veces aparece el usuario en la lista
+            long count = usuariosPrestamo.stream()
+                    .filter(u -> u.equals(usuario))
+                    .count();
+            usuarioTienePrestamo = count > 0;
+        }
+
+        if (!usuarioTienePrestamo) {
+            Validacion.mensajeDevolucionNOvalida(usuario);
+        }
+
+        // Remover una ocurrencia del usuario
+        boolean removed = false;
+        if (usuariosPrestamo != null) {
+            for (int i = 0; i < usuariosPrestamo.size(); i++) {
+                if (usuariosPrestamo.get(i).equals(usuario)) {
+                    usuariosPrestamo.remove(i);
+                    removed = true;
+                    break;
+                }
+            }
+        }
+
+        if (removed) {
+            if (cantidadDisponible < cantidadTotal) {
+                cantidadDisponible++;
+                disponible = cantidadDisponible > 0;
+            }
+            return true;
+        } else {
+            // Esto no debería pasar si ya verificamos que tiene préstamos
+            return false;
+        }
+    }
+
+    /**
+     *  Guardar libro en el JSON evitando duplicados.
+     */
     public void guardarEnJSON() {
         try {
             File archivo = new File(RUTA_JSON);
@@ -95,12 +180,12 @@ public class Libro {
             if (!carpeta.exists())
                 carpeta.mkdirs();
 
-            ObjectMapper mapper = new ObjectMapper();
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             List<Libro> lista;
 
             // Si el archivo ya existe, cargar los libros existentes
             if (archivo.exists()) {
-                lista = mapper.readValue(archivo, new TypeReference<List<Libro>>() {
+                lista = mapper.readValue(archivo, new com.fasterxml.jackson.core.type.TypeReference<List<Libro>>() {
                 });
             } else {
                 lista = new ArrayList<>();
@@ -113,41 +198,42 @@ public class Libro {
             if (!existe) {
                 lista.add(this);
                 mapper.writerWithDefaultPrettyPrinter().writeValue(archivo, lista);
-                System.out.println("✅ Libro guardado correctamente en: " + archivo.getAbsolutePath());
+                Validacion.mensajeLibroAgregado(this.titulo);
             } else {
-                System.out.println("⚠️ El libro con título o ISBN ya existe.");
+                Validacion.mensajeLibroYaExiste(this.titulo);
             }
 
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             e.printStackTrace();
         }
     }
-
-    // 🔹 Cargar todos los libros
+    /**
+     * Carga todos los libros registrados desde el archivo JSON.
+     * @return lista de libros
+     */
     public static List<Libro> cargarTodos() {
         try {
             File archivo = new File(RUTA_JSON);
             if (!archivo.exists())
                 return new ArrayList<>();
 
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(archivo, new TypeReference<List<Libro>>() {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            return mapper.readValue(archivo, new com.fasterxml.jackson.core.type.TypeReference<List<Libro>>() {
             });
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
 
-    // 🔹 Buscar libro por ISBN
-    public static Libro buscarPorIsbn(String isbn) {
+    /** Busca un libro por ISBN. */
+        public static Libro buscarPorIsbn(String isbn) {
         return cargarTodos().stream()
                 .filter(l -> l.getIsbn().equalsIgnoreCase(isbn))
                 .findFirst()
                 .orElse(null);
     }
-
-    // 🔹 Buscar libro por título
+/** Busca un libro por título. */
     public static Libro buscarPorTitulo(String titulo) {
         return cargarTodos().stream()
                 .filter(l -> l.getTitulo().equalsIgnoreCase(titulo))
@@ -155,19 +241,32 @@ public class Libro {
                 .orElse(null);
     }
 
-    public void prestar(String usuario) {
-        this.disponible = false;
-        this.usuarioPrestamo = usuario;
+
+    /**
+     * Obtiene la cantidad de ejemplares prestados a un usuario específico
+     */
+    public int getCantidadPrestadaAUsuario(String usuario) {
+        if (usuariosPrestamo == null)
+            return 0;
+        return (int) usuariosPrestamo.stream()
+                .filter(u -> u.equals(usuario))
+                .count();
     }
 
-    public boolean devolver(String usuario) {
-        // Solo el mismo usuario puede devolverlo
-        if (usuarioPrestamo != null && usuarioPrestamo.equalsIgnoreCase(usuario)) {
-            this.disponible = true;
-            this.usuarioPrestamo = null;
-            return true;
-        }
-        return false; // No autorizado
+    /**
+     * Obtiene todos los usuarios que tienen préstamos activos de este libro
+     */
+    public List<String> getUsuariosConPrestamos() {
+        if (usuariosPrestamo == null)
+            return new ArrayList<>();
+        return new ArrayList<>(usuariosPrestamo);
+    }
+
+    /**
+     * Obtiene la cantidad total de préstamos activos
+     */
+    public int getTotalPrestamosActivos() {
+        return usuariosPrestamo != null ? usuariosPrestamo.size() : 0;
     }
 
 }

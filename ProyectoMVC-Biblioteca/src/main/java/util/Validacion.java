@@ -1,7 +1,7 @@
 package util;
 
 import java.awt.Frame;
-import javax.swing.JOptionPane;
+
 
 import model.Catalogo;
 import model.Libro;
@@ -9,7 +9,7 @@ import view.LoginView;
 import view.RegistroView;
 
 public final class Validacion {
-    private static final String TITULO = "Biblioteca";
+    
 
     private Validacion() {
     }
@@ -17,28 +17,16 @@ public final class Validacion {
     // =======================
     // 🔹 Métodos de mensajes
     // =======================
-    private static void mostrarInfoInterno(String mensaje) {
-        JOptionPane.showMessageDialog(null, mensaje, TITULO, JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private static void mostrarErrorInterno(String mensaje) {
-        JOptionPane.showMessageDialog(null, mensaje, TITULO, JOptionPane.ERROR_MESSAGE);
-    }
-
-    private static void mostrarAdvertenciaInterno(String mensaje) {
-        JOptionPane.showMessageDialog(null, mensaje, TITULO, JOptionPane.WARNING_MESSAGE);
-    }
-
     public static void mostrarInfo(String mensaje) {
-        mostrarInfoInterno(mensaje);
+        Diseno.mostrarMensajeInfo(null, mensaje);
     }
 
     public static void mostrarError(String mensaje) {
-        mostrarErrorInterno(mensaje);
+        Diseno.mostrarMensajeError(null, mensaje);
     }
 
     public static void mostrarAdvertencia(String mensaje) {
-        mostrarAdvertenciaInterno(mensaje);
+        Diseno.mostrarMensajeAdvertencia(null, mensaje);
     }
 
     // =======================
@@ -67,6 +55,9 @@ public final class Validacion {
     public static void mensajeLibroNoEncontrado(String titulo) {
         mostrarError("No se encontró el libro '" + titulo + "' en el catálogo.");
     }
+    public static void mensajeDevolucionNOvalida(String titulo) {
+        mostrarError("el libro '" + titulo + " no puede ser devuelto por no estar prestado.");
+    }
 
     public static void mensajeLibroNoDisponible(String titulo) {
         mostrarError("El libro '" + titulo + "' no está disponible.");
@@ -83,6 +74,9 @@ public final class Validacion {
     public static void mensajeCatalogoVacio() {
         mostrarInfo("El catálogo está vacío.");
     }
+    public static void mensajeError() {
+        mostrarInfo("Ocurrio un error");
+    }
 
     public static void mensajeregistroexitoso() {
         mostrarInfo("Registro Exitoso.");
@@ -97,11 +91,17 @@ public final class Validacion {
     }
 
     public static void mensajeusuarioguardado() {
-        mostrarInfo("✅ Usuario guardado correctamente en: ");
+        mostrarInfo("Usuario guardado correctamente en: ");
     };
 
     public static void mensajecedularepetida(String titulo) {
         mostrarAdvertencia("la cedula ya existe");
+    }
+    public static void mensajeCantidadInvalida(String titulo) {
+        mostrarAdvertencia("debe agregar como minimo un libro");
+    }
+    public static void ejemplarPrestado(String titulo) {
+        mostrarAdvertencia("Ya tienes prestado este libro");
     }
 
     // =======================
@@ -153,7 +153,7 @@ public final class Validacion {
 
             // Si el usuario seleccionó "Registrar"
             if (login.isRegistroSelected()) {
-                RegistroView registro = new RegistroView();
+                RegistroView registro = new RegistroView(login);
                 registro.setVisible(true);
                 // Después de registro, repetir el bucle para intentar login otra vez
                 continue;
@@ -169,15 +169,15 @@ public final class Validacion {
             AuthService.Role role = AuthService.verificarClave(clave);
 
             if (role == AuthService.Role.INVALID) {
-                mostrarErrorInterno("Clave inválida. Intenta de nuevo.");
+                mostrarError("Clave inválida. Intenta de nuevo.");
                 continue;
             }
 
-            mostrarInfoInterno("Inicio de sesión exitoso.");
+            mostrarInfo("Inicio de sesión exitoso.");
             return role;
         }
 
-        mostrarAdvertenciaInterno("Se superó el número máximo de intentos.");
+         mostrarAdvertencia("Se superó el número máximo de intentos.");
         return AuthService.Role.INVALID;
     }
 
